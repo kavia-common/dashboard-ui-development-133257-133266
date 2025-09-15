@@ -17,6 +17,12 @@ import {
 } from "./sections";
 import { canAccess } from "./utils/types";
 
+/**
+ * Note: Preview mode flag to bypass UI-level RBAC for demo/testing.
+ * This should NEVER be used for production access control.
+ */
+const PREVIEW_MODE_SHOW_ADMIN = true;
+
 // PUBLIC_INTERFACE
 function App() {
   const [theme, setTheme] = useState("light");
@@ -55,7 +61,8 @@ function App() {
     { key: "usage", label: "Usage Patterns" },
     { key: "featureflags", label: "Feature Flag & Rollout Tracking" },
     { key: "cost", label: "Cost & Credits" },
-    { key: "admin", label: "Kavia-Admin Only" },
+    // Always show Admin section in sidebar for preview/testing
+    { key: "admin", label: "Kavia-Admin Only (Preview Access)" },
   ];
 
   const toolbar = (
@@ -96,7 +103,11 @@ function App() {
       case "cost":
         return <CostCredits rbac={rbac} />;
       case "admin":
-        // Gate visibility at section level as well
+        // Preview bypass: allow access regardless of role
+        if (PREVIEW_MODE_SHOW_ADMIN) {
+          return <KaviaAdminOnly rbac={rbac} previewBypass />;
+        }
+        // Fallback to original mock gating (shouldn't be hit in preview)
         if (!canAccess(rbac, ["KAVIA_ADMIN"])) {
           return <p className="text-sm text-red-600 dark:text-red-400">Admin access required.</p>;
         }
@@ -114,6 +125,8 @@ function App() {
       onToggleTheme={toggleTheme}
       theme={theme}
       toolbar={toolbar}
+      // Show a global banner to indicate preview-only RBAC bypass
+      previewNotice={PREVIEW_MODE_SHOW_ADMIN ? "Preview/Test Mode: Kavia-Admin Only section is visible to all roles for UI review. Do not use this as production access control." : undefined}
     >
       {renderSection()}
     </Layout>

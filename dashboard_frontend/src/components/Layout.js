@@ -1,7 +1,7 @@
 import React from "react";
 
 // PUBLIC_INTERFACE
-export default function Layout({ sections, current, onNavigate, onToggleTheme, theme, toolbar, children }) {
+export default function Layout({ sections, current, onNavigate, onToggleTheme, theme, toolbar, children, previewNotice }) {
   const navItem = (key, label) => {
     const active = current === key;
     return (
@@ -34,6 +34,14 @@ export default function Layout({ sections, current, onNavigate, onToggleTheme, t
           </button>
         </div>
       </header>
+
+      {previewNotice && (
+        <div className="bg-amber-50 dark:bg-amber-900/30 border-b border-amber-200 dark:border-amber-800">
+          <div className="max-w-7xl mx-auto px-3 md:px-6 py-2 text-amber-800 dark:text-amber-200 text-xs">
+            {previewNotice}
+          </div>
+        </div>
+      )}
 
       {toolbar}
 

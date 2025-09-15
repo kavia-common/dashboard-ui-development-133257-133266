@@ -484,11 +484,25 @@ export function CostCredits({ rbac }) {
 }
 
 // PUBLIC_INTERFACE
-export function KaviaAdminOnly({ rbac }) {
+export function KaviaAdminOnly({ rbac, previewBypass = false }) {
   const minRoles = ["KAVIA_ADMIN"];
-  const allowed = canAccess(rbac, minRoles);
+  // In previewBypass, ignore mock RBAC and always render content.
+  const allowed = previewBypass ? true : canAccess(rbac, minRoles);
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {previewBypass && (
+        <div className="md:col-span-2">
+          <Card
+            title="Preview Notice"
+            subtitle="Temporary bypass for UI review"
+            roleBadge={<RoleBadge minRoles={minRoles} />}
+          >
+            <p className="text-xs text-amber-700 dark:text-amber-300">
+              This section is visible to all roles in preview/test mode for demonstration purposes only. Do not rely on this UI for production access control.
+            </p>
+          </Card>
+        </div>
+      )}
       <Card title="ROI by Department" subtitle="Admin-only" roleBadge={<RoleBadge minRoles={minRoles} />}>
         <div className="grid grid-cols-1 gap-4">
           <BarChartLike data={mockAdminOnly.roiByDept.map(r => ({ dept: r.dept, roi: Math.round(r.roi * 100) }))} xKey="dept" yKey="roi" color="#10b981" />
@@ -527,7 +541,11 @@ export function KaviaAdminOnly({ rbac }) {
           rows={mockAdminOnly.churnRisk}
         />
       </Card>
-      {!allowed && <p className="text-sm text-red-600 dark:text-red-400">Admin access required.</p>}
+      {!allowed && (
+        <p className="text-sm text-red-600 dark:text-red-400">
+          Admin access required.
+        </p>
+      )}
     </div>
   );
 }
