@@ -2,6 +2,11 @@
 
 This project provides a minimal React template with a clean, modern UI and minimal dependencies.
 
+Note: The dashboard now includes advanced analytics previews (heatmaps, network, onboarding, sentiment, logs/audit, cohorts, before/after, funnels, cost allocations) and real exports:
+- Per-card Export PNG button captures charts/tables without mocks.
+- Global toolbar Export PNG/PDF snapshots the current section.
+- CSV export is available per table via future wiring; global CSV reserved for combined exports.
+
 ## Features
 
 - **Lightweight**: No heavy UI frameworks - uses only vanilla CSS and React

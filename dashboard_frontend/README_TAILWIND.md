@@ -8,11 +8,13 @@ How to run:
 
 Key features:
 - Sidebar navigation across 10 sections
-- Global toolbar with filters, search, export buttons
+- Global toolbar with filters, search, export buttons (PNG/PDF export without mocks; CSV per-table coming via cards)
 - Light/Dark theme toggle (Tailwind dark mode)
 - Role-based rendering scaffolding (placeholder roles in App.js)
 - Mocked data for widgets and clear interfaces for future API integration
 - Accessible components (labels, aria attributes, keyboard-friendly)
+- Advanced visuals: time/team-feature heatmaps, network diagram, onboarding progress, sentiment tables, logs/audit, retention, before/after, funnels, cost allocations
+- Drill-down: row click actions and per-card Export PNG
 
 To change roles:
 - In src/App.js, edit the rbac roles array to include roles such as "KAVIA_ADMIN", "FINANCE", etc.

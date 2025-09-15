@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, BarChartLike, LineChartLike, PieChartLike, Gauge, SimpleTable, Legend } from "../components/primitives";
+import { Card, BarChartLike, LineChartLike, PieChartLike, Gauge, SimpleTable, Legend, DrilldownCard, HeatmapGrid, NetworkGraph } from "../components/primitives";
 import {
   mockTimeSeries,
   mockModuleUsage,
@@ -16,8 +16,22 @@ import {
   mockUsageByTime,
   mockGeoUsage,
   mockFeedbackFunnel,
-  mockAdminOnly
+  mockAdminOnly,
+  mockTimeHeatmap,
+  mockTeamFeatureHeatmap,
+  mockNetwork,
+  mockOnboarding,
+  mockFeedbackSentiment,
+  mockResolutionTimes,
+  mockErrorLogs,
+  mockAudit,
+  mockCohorts,
+  mockBeforeAfter,
+  mockWorkflowFunnels,
+  mockCostAllocations,
+  mockGeoCompliance
 } from "../utils/mockData";
+import { InfoTooltip, GlossaryPanel } from "../components/Glossary";
 import { canAccess } from "../utils/types";
 
 // Helpers to colorize pies
@@ -35,7 +49,7 @@ export function AdoptionEngagement({ rbac }) {
   const allowed = canAccess(rbac, minRoles);
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <Card title="DAU / WAU / MAU" subtitle="Monthly trend" roleBadge={<RoleBadge minRoles={minRoles} />}>
+      <Card title={<span>DAU / WAU / MAU <InfoTooltip term="DAU/WAU/MAU" definition="Daily/Weekly/Monthly Active Users based on unique sessions." /></span>} subtitle="Monthly trend" roleBadge={<RoleBadge minRoles={minRoles} />}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <div className="text-xs mb-2">DAU</div>
@@ -95,6 +109,25 @@ export function AdoptionEngagement({ rbac }) {
             />
           </div>
         </div>
+      </Card>
+
+      <DrilldownCard title="Time Heatmap" subtitle="Usage by hour/day" roleBadge={<RoleBadge minRoles={minRoles} />}>
+        <HeatmapGrid
+          values={mockTimeHeatmap.values}
+          xLabels={mockTimeHeatmap.xLabels}
+          yLabels={mockTimeHeatmap.yLabels}
+          valueToColor={(v) => `hsl(210 80% ${Math.max(25, Math.min(90, 100 - v / 2))}%)`}
+        />
+      </DrilldownCard>
+
+      <Card title="Glossary" subtitle="Key metrics">
+        <GlossaryPanel
+          items={[
+            { term: "Adoption", definition: "Proportion of eligible users who actively use the platform." },
+            { term: "Retention", definition: "Percentage of users returning after a period of time." },
+            { term: "Engagement", definition: "Depth/frequency of interactions with features." },
+          ]}
+        />
       </Card>
 
       <Card title="Active Usage Snapshot" subtitle="Monthly rolling user activity" roleBadge={<RoleBadge minRoles={minRoles} />}>
@@ -168,6 +201,31 @@ export function Effectiveness({ rbac }) {
           />
         </div>
       </Card>
+
+      <Card title="Before vs After (Workflow Time)" subtitle="Minutes saved" roleBadge={<RoleBadge minRoles={minRoles} />}>
+        <SimpleTable
+          columns={[
+            { key: "workflow", header: "Workflow" },
+            { key: "beforeMin", header: "Before (min)" },
+            { key: "afterMin", header: "After (min)" },
+            { key: "saved", header: "Saved (min)", render: (_v, row) => row.beforeMin - row.afterMin },
+          ]}
+          rows={mockBeforeAfter.map((r) => ({ ...r, saved: r.beforeMin - r.afterMin }))}
+        />
+      </Card>
+
+      <DrilldownCard title="Workflow Funnels by Team" subtitle="Start -> Stage1 -> Stage2 -> Done" roleBadge={<RoleBadge minRoles={minRoles} />}>
+        <SimpleTable
+          columns={[
+            { key: "team", header: "Team" },
+            { key: "start", header: "Start" },
+            { key: "stage1", header: "Stage 1" },
+            { key: "stage2", header: "Stage 2" },
+            { key: "done", header: "Done" },
+          ]}
+          rows={mockWorkflowFunnels}
+        />
+      </DrilldownCard>
     </div>
   );
 }
@@ -214,6 +272,46 @@ export function TrainingAwareness() {
           </div>
         </div>
       </Card>
+
+      <Card title="Onboarding Progress" subtitle="Milestones">
+        <SimpleTable
+          columns={[
+            { key: "user", header: "User" },
+            { key: "team", header: "Team" },
+            { key: "milestone", header: "Current Milestone" },
+            { key: "progress", header: "Progress", render: (v) => `${v}%` },
+          ]}
+          rows={mockOnboarding}
+        />
+        <div className="space-y-2 mt-3">
+          {mockOnboarding.map((o) => (
+            <div key={o.user}>
+              <div className="flex justify-between text-xs"><span>{o.user}</span><span>{o.progress}%</span></div>
+              <div className="h-2 bg-slate-200 dark:bg-slate-800 rounded">
+                <div className="h-2 bg-emerald-500 dark:bg-emerald-400 rounded" style={{ width: `${o.progress}%` }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      <Card title="Cohort Retention" subtitle="D0/D7/D14/D30">
+        <SimpleTable
+          columns={[
+            { key: "cohort", header: "Cohort" },
+            { key: "d0", header: "D0 (%)" },
+            { key: "d7", header: "D7 (%)" },
+            { key: "d14", header: "D14 (%)" },
+            { key: "d30", header: "D30 (%)" },
+          ]}
+          rows={mockCohorts}
+        />
+        <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div><div className="text-xs mb-1">D7</div><LineChartLike data={mockCohorts.map(c => ({ label: c.cohort, val: c.d7 }))} xKey="label" yKey="val" color="#3b82f6" /></div>
+          <div><div className="text-xs mb-1">D14</div><LineChartLike data={mockCohorts.map(c => ({ label: c.cohort, val: c.d14 }))} xKey="label" yKey="val" color="#10b981" /></div>
+          <div><div className="text-xs mb-1">D30</div><LineChartLike data={mockCohorts.map(c => ({ label: c.cohort, val: c.d30 }))} xKey="label" yKey="val" color="#f59e0b" /></div>
+        </div>
+      </Card>
     </div>
   );
 }
@@ -240,8 +338,9 @@ export function OrganizationalMetrics() {
           </div>
         </div>
       </Card>
-      <Card title="Collaboration" subtitle="Placeholder for network or matrix">
-        <div className="text-sm text-slate-500 dark:text-slate-400">Network diagram placeholder</div>
+
+      <DrilldownCard title="Collaboration Network" subtitle="Teams interactions">
+        <NetworkGraph nodes={mockNetwork.nodes} links={mockNetwork.links} />
         <div aria-label="Collaboration summary table" role="region" className="mt-4">
           <SimpleTable
             columns={[
@@ -255,7 +354,16 @@ export function OrganizationalMetrics() {
             ]}
           />
         </div>
-      </Card>
+      </DrilldownCard>
+
+      <DrilldownCard title="Team-Feature Heatmap" subtitle="Intensity of usage">
+        <HeatmapGrid
+          values={mockTeamFeatureHeatmap.values}
+          xLabels={mockTeamFeatureHeatmap.features}
+          yLabels={mockTeamFeatureHeatmap.teams}
+          valueToColor={(v) => `hsl(${(200 - v) * 2} 80% ${Math.max(30, 100 - v)}%)`}
+        />
+      </DrilldownCard>
     </div>
   );
 }
@@ -293,6 +401,54 @@ export function FeedbackProblemDetection() {
           </div>
         </div>
       </Card>
+
+      <Card title="Feedback Sentiment & Categories" subtitle="Recent tickets">
+        <SimpleTable
+          columns={[
+            { key: "id", header: "Ticket" },
+            { key: "team", header: "Team" },
+            { key: "category", header: "Category" },
+            { key: "sentiment", header: "Sentiment" },
+            { key: "score", header: "Score", render: (v) => v.toFixed(2) },
+          ]}
+          rows={mockFeedbackSentiment}
+        />
+      </Card>
+
+      <Card title="Resolution Times" subtitle="Median and p90 (hours)">
+        <SimpleTable
+          columns={[
+            { key: "category", header: "Category" },
+            { key: "medianH", header: "Median (h)" },
+            { key: "p90H", header: "p90 (h)" },
+          ]}
+          rows={mockResolutionTimes}
+        />
+      </Card>
+
+      <DrilldownCard title="Error Logs" subtitle="Last 10">
+        <SimpleTable
+          columns={[
+            { key: "ts", header: "Timestamp" },
+            { key: "level", header: "Level" },
+            { key: "component", header: "Component" },
+            { key: "message", header: "Message" },
+          ]}
+          rows={mockErrorLogs}
+        />
+      </DrilldownCard>
+
+      <DrilldownCard title="Audit Trail" subtitle="Key user actions">
+        <SimpleTable
+          columns={[
+            { key: "ts", header: "Timestamp" },
+            { key: "user", header: "User" },
+            { key: "action", header: "Action" },
+            { key: "detail", header: "Detail" },
+          ]}
+          rows={mockAudit}
+        />
+      </DrilldownCard>
     </div>
   );
 }
@@ -322,6 +478,7 @@ export function TeamAnalytics() {
               { key: "score", header: "Engagement Score" },
             ]}
             rows={mockTeamAdoption}
+            onRowClick={(row) => alert(`Drill-down: ${row.team} engagement details`)}
           />
         </div>
       </Card>
@@ -382,6 +539,17 @@ export function UsagePatterns() {
             />
           </div>
         </div>
+      </Card>
+      <Card title="Geo Compliance" subtitle="Region compliance status">
+        <div className="text-xs text-slate-500 dark:text-slate-400 mb-2">Map placeholder</div>
+        <SimpleTable
+          columns={[
+            { key: "region", header: "Region" },
+            { key: "usage", header: "Usage" },
+            { key: "compliant", header: "Compliant", render: (v) => (v ? "✅" : "⚠️") },
+          ]}
+          rows={mockGeoCompliance}
+        />
       </Card>
     </div>
   );
@@ -478,6 +646,18 @@ export function CostCredits({ rbac }) {
           ]}
         />
       </Card>
+      <DrilldownCard title="Allocations & Limits" subtitle="By team/entity" roleBadge={<RoleBadge minRoles={minRoles} />}>
+        <SimpleTable
+          columns={[
+            { key: "entity", header: "Entity" },
+            { key: "credits", header: "Credits Used" },
+            { key: "limit", header: "Limit" },
+            { key: "util", header: "Utilization", render: (_v, r) => `${Math.round((r.credits / r.limit) * 100)}%` },
+            { key: "cost", header: "Cost ($)" },
+          ]}
+          rows={mockCostAllocations.map((r) => ({ ...r, util: Math.round((r.credits / r.limit) * 100) }))}
+        />
+      </DrilldownCard>
       {!allowed && <p className="text-sm text-red-600 dark:text-red-400">Access restricted for your role.</p>}
     </div>
   );
@@ -541,6 +721,65 @@ export function KaviaAdminOnly({ rbac, previewBypass = false }) {
           rows={mockAdminOnly.churnRisk}
         />
       </Card>
+
+      <Card title="Benchmarking" subtitle="Comparisons vs peer averages" roleBadge={<RoleBadge minRoles={minRoles} />}>
+        <SimpleTable
+          columns={[
+            { key: "metric", header: "Metric" },
+            { key: "tenant", header: "Tenant" },
+            { key: "peers", header: "Peers Avg" },
+          ]}
+          rows={[
+            { metric: "Latency p95 (ms)", tenant: 210, peers: 240 },
+            { metric: "Acceptance Rate (%)", tenant: 62, peers: 55 },
+            { metric: "Cost per Unit ($)", tenant: 0.14, peers: 0.18 },
+          ]}
+        />
+      </Card>
+
+      <Card title="Capacity & Predictive Analytics" subtitle="Trend and forecast" roleBadge={<RoleBadge minRoles={minRoles} />}>
+        <div className="grid grid-cols-1 gap-3">
+          <div>
+            <div className="text-xs mb-1">Capacity Utilization</div>
+            <LineChartLike data={mockAdminOnly.latencyMs.map((d, i) => ({ label: d.label, val: 60 + i * 2 }))} xKey="label" yKey="val" color="#8b5cf6" />
+          </div>
+          <div>
+            <div className="text-xs mb-1">Forecast</div>
+            <LineChartLike data={mockAdminOnly.latencyMs.map((d, i) => ({ label: d.label, val: 65 + i * 2.3 }))} xKey="label" yKey="val" color="#f59e0b" />
+          </div>
+        </div>
+      </Card>
+
+      <Card title="Integration Health" subtitle="GitHub/Jira/CI/CD" roleBadge={<RoleBadge minRoles={minRoles} />}>
+        <SimpleTable
+          columns={[
+            { key: "integration", header: "Integration" },
+            { key: "status", header: "Status" },
+            { key: "errors", header: "Errors (24h)" },
+          ]}
+          rows={[
+            { integration: "GitHub", status: "OK", errors: 1 },
+            { integration: "Jira", status: "Degraded", errors: 5 },
+            { integration: "CI/CD", status: "OK", errors: 0 },
+          ]}
+        />
+      </Card>
+
+      <Card title="Compliance & Security" subtitle="Scorecards" roleBadge={<RoleBadge minRoles={minRoles} />}>
+        <SimpleTable
+          columns={[
+            { key: "control", header: "Control" },
+            { key: "status", header: "Status" },
+            { key: "notes", header: "Notes" },
+          ]}
+          rows={[
+            { control: "PII Masking", status: "Compliant", notes: "Auto redaction enabled" },
+            { control: "Data Residency", status: "Warning", notes: "APAC region non-compliant" },
+            { control: "Access Logs", status: "Compliant", notes: "Retained 180 days" },
+          ]}
+        />
+      </Card>
+
       {!allowed && (
         <p className="text-sm text-red-600 dark:text-red-400">
           Admin access required.

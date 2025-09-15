@@ -10,7 +10,8 @@ export default function GlobalToolbar({
   onChange,
   onExport,
   onSearch,
-  roleQuickFilter
+  roleQuickFilter,
+  exportTargetRef,
 }) {
   const handle = (key, val) => onChange && onChange({ ...filters, [key]: val });
 
@@ -93,10 +94,17 @@ export default function GlobalToolbar({
           </button>
           <button
             type="button"
-            onClick={() => onExport && onExport("png")}
+            onClick={() => onExport && onExport("png", exportTargetRef?.current)}
             className="px-3 py-1.5 rounded text-sm bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-100 border border-slate-300 dark:border-slate-700"
           >
             Export PNG
+          </button>
+          <button
+            type="button"
+            onClick={() => onExport && onExport("pdf", exportTargetRef?.current)}
+            className="px-3 py-1.5 rounded text-sm bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-100 border border-slate-300 dark:border-slate-700"
+          >
+            Export PDF
           </button>
           {!!roleQuickFilter && (
             <span className="text-[10px] px-2 py-1 rounded border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300">

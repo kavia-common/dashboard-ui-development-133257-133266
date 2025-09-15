@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useRef } from "react";
+import { exportNodeAsPNG } from "../utils/exporters";
 
 // PUBLIC_INTERFACE
 export function Card({ title, subtitle, children, actions, roleBadge, ariaLabel }) {
@@ -28,6 +29,38 @@ export function Card({ title, subtitle, children, actions, roleBadge, ariaLabel 
       )}
       <div className="p-4">{children}</div>
     </section>
+  );
+}
+
+// PUBLIC_INTERFACE
+export function DrilldownCard({ title, subtitle, children, roleBadge }) {
+  /**
+   * A Card variant that includes built-in Export PNG and a contentRef to snapshot the visible visualization/table.
+   */
+  const contentRef = useRef(null);
+  const onExportPNG = async () => {
+    if (contentRef.current) {
+      await exportNodeAsPNG(`${title.replace(/\s+/g, "_").toLowerCase()}.png`, contentRef.current);
+    }
+  };
+  return (
+    <Card
+      title={title}
+      subtitle={subtitle}
+      roleBadge={roleBadge}
+      actions={
+        <button
+          type="button"
+          onClick={onExportPNG}
+          className="px-2 py-1 text-xs rounded border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-200"
+          aria-label="Export PNG"
+        >
+          Export PNG
+        </button>
+      }
+    >
+      <div ref={contentRef}>{children}</div>
+    </Card>
   );
 }
 
@@ -140,7 +173,7 @@ export function Gauge({ value, max = 100, label = "Gauge", color = "#f59e0b" }) 
 }
 
 // PUBLIC_INTERFACE
-export function SimpleTable({ columns, rows }) {
+export function SimpleTable({ columns, rows, onRowClick }) {
   return (
     <div className="overflow-auto">
       <table className="w-full text-left border-collapse">
@@ -155,7 +188,11 @@ export function SimpleTable({ columns, rows }) {
         </thead>
         <tbody>
           {rows.map((r, i) => (
-            <tr key={i} className="odd:bg-white even:bg-slate-50 dark:odd:bg-slate-900 dark:even:bg-slate-800">
+            <tr
+              key={i}
+              className="odd:bg-white even:bg-slate-50 dark:odd:bg-slate-900 dark:even:bg-slate-800 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800"
+              onClick={() => onRowClick && onRowClick(r)}
+            >
               {columns.map((c) => (
                 <td key={c.key} className="px-3 py-2 text-xs text-slate-700 dark:text-slate-200 border-b border-slate-200 dark:border-slate-700">
                   {typeof c.render === "function" ? c.render(r[c.key], r) : r[c.key]}
@@ -165,6 +202,86 @@ export function SimpleTable({ columns, rows }) {
           ))}
         </tbody>
       </table>
+    </div>
+  );
+}
+
+// PUBLIC_INTERFACE
+export function HeatmapGrid({ values, xLabels = [], yLabels = [], valueToColor }) {
+  /**
+   * Simple heatmap renderer; valueToColor maps a numeric value to a color string.
+   */
+  const maxCols = values[0]?.length || 0;
+  return (
+    <div className="flex">
+      <div className="mr-2">
+        <div className="h-6" />
+        {yLabels.map((y, yi) => (
+          <div key={yi} className="h-6 text-[10px] text-slate-500 dark:text-slate-400 flex items-center">{y}</div>
+        ))}
+      </div>
+      <div className="flex-1">
+        <div className="grid" style={{ gridTemplateColumns: `repeat(${maxCols}, minmax(0, 1fr))` }}>
+          {xLabels.map((x, xi) => (
+            <div key={xi} className="h-6 text-[10px] text-slate-500 dark:text-slate-400 flex items-center justify-center">{x}</div>
+          ))}
+        </div>
+        <div className="grid" style={{ gridTemplateColumns: `repeat(${maxCols}, minmax(0, 1fr))` }}>
+          {values.flatMap((row, ri) =>
+            row.map((v, ci) => (
+              <div
+                key={`${ri}-${ci}`}
+                className="h-6 w-6"
+                title={`${yLabels[ri] ?? ri}, ${xLabels[ci] ?? ci}: ${v}`}
+                style={{ backgroundColor: valueToColor ? valueToColor(v) : `hsl(${(v * 5) % 360} 70% 60%)` }}
+              />
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// PUBLIC_INTERFACE
+export function NetworkGraph({ nodes, links }) {
+  /**
+   * Lightweight network diagram using absolute-position nodes and SVG link lines.
+   * Nodes: [{ id, label, x, y }]
+   * Links: [{ source, target, weight }]
+   */
+  const width = 520;
+  const height = 280;
+  return (
+    <div className="relative" style={{ width, height }}>
+      <svg className="absolute inset-0" width={width} height={height} aria-label="network">
+        {links.map((l, idx) => {
+          const s = nodes.find((n) => n.id === l.source);
+          const t = nodes.find((n) => n.id === l.target);
+          if (!s || !t) return null;
+          return (
+            <line
+              key={idx}
+              x1={s.x}
+              y1={s.y}
+              x2={t.x}
+              y2={t.y}
+              stroke="rgba(59,130,246,0.5)"
+              strokeWidth={Math.max(1, l.weight || 1)}
+            />
+          );
+        })}
+      </svg>
+      {nodes.map((n) => (
+        <div
+          key={n.id}
+          className="absolute -translate-x-1/2 -translate-y-1/2 px-2 py-1 text-[10px] rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow"
+          style={{ left: n.x, top: n.y }}
+          title={n.label}
+        >
+          {n.label}
+        </div>
+      ))}
     </div>
   );
 }

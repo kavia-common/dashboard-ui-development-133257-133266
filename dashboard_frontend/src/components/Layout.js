@@ -21,7 +21,7 @@ export default function Layout({ sections, current, onNavigate, onToggleTheme, t
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
       <header className="flex items-center justify-between px-4 md:px-6 py-3 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/70 backdrop-blur">
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded bg-kavia-orange" aria-hidden />
+          <div className="w-6 h-6 rounded bg-[color:var(--kavia-orange,#E87A41)]" aria-hidden />
           <span className="font-semibold">Kavia Dashboard</span>
         </div>
         <div className="flex items-center gap-2">

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import "./index.css";
 import "./App.css";
 import Layout from "./components/Layout";
@@ -51,6 +51,8 @@ function App() {
   // PUBLIC_INTERFACE
   const toggleTheme = () => setTheme((t) => (t === "light" ? "dark" : "light"));
 
+  const mainExportTargetRef = useRef(null);
+
   const sections = [
     { key: "adoption", label: "Adoption & Engagement" },
     { key: "effectiveness", label: "Effectiveness" },
@@ -69,16 +71,25 @@ function App() {
     <GlobalToolbar
       filters={filters}
       onChange={setFilters}
-      onExport={(fmt) => {
-        // Placeholder export
-        // eslint-disable-next-line no-alert
-        alert(`Exporting current view as ${fmt.toUpperCase()}`);
+      onExport={async (fmt, node) => {
+        if (fmt === "csv") {
+          // CSV export requires the currently focused table; in preview, export nothing-specific
+          // Sections expose drilldown cards with their own PNG button; this CSV here is global-search driven.
+          // Use a noop alert for confirmation of action
+          alert("Use per-table Export in cards for CSV. Global CSV reserved for future combined export.");
+        } else if (fmt === "png") {
+          const { exportNodeAsPNG } = await import("./utils/exporters");
+          await exportNodeAsPNG("dashboard_view.png", node || mainExportTargetRef.current);
+        } else if (fmt === "pdf") {
+          const { exportAsPDF } = await import("./utils/exporters");
+          await exportAsPDF("dashboard_view.pdf", node || mainExportTargetRef.current);
+        }
       }}
       onSearch={(q) => {
-        // Placeholder search
         console.log("Search query:", q);
       }}
       roleQuickFilter={rbac.roles.join(", ")}
+      exportTargetRef={mainExportTargetRef}
     />
   );
 
@@ -128,7 +139,9 @@ function App() {
       // Show a global banner to indicate preview-only RBAC bypass
       previewNotice={PREVIEW_MODE_SHOW_ADMIN ? "Preview/Test Mode: Kavia-Admin Only section is visible to all roles for UI review. Do not use this as production access control." : undefined}
     >
-      {renderSection()}
+      <div ref={mainExportTargetRef}>
+        {renderSection()}
+      </div>
     </Layout>
   );
 }
