@@ -18,8 +18,8 @@ function cyc(arr, i) {
   return arr[i % arr.length];
 }
 
-/** Random int between [min, max] */
-function ri(min, max) {
+/** Random int between [min, max], inclusive of both ends. */
+function randomIntInclusive(min, max) {
   return Math.round(min + Math.random() * (max - min));
 }
 
@@ -43,9 +43,9 @@ export const mockTimeSeries = [
   ...genMonthly(12).map(({ label, period, _i }) => ({
     label,
     period,
-    dau: ri(120, 320),
-    wau: ri(360, 680),
-    mau: ri(700, 1200),
+    dau: randomIntInclusive(120, 320),
+    wau: randomIntInclusive(360, 680),
+    mau: randomIntInclusive(700, 1200),
     team: cyc(TEAMS, _i),
     dept: cyc(DEPTS, _i + 1),
     region: cyc(REGIONS, _i + 2),
@@ -53,9 +53,9 @@ export const mockTimeSeries = [
   ...genWeekly(10).map(({ label, period, _i }) => ({
     label,
     period,
-    dau: ri(90, 240),
-    wau: ri(280, 520),
-    mau: ri(600, 1000),
+    dau: randomIntInclusive(90, 240),
+    wau: randomIntInclusive(280, 520),
+    mau: randomIntInclusive(600, 1000),
     team: cyc(TEAMS, _i + 2),
     dept: cyc(DEPTS, _i),
     region: cyc(REGIONS, _i + 1),
@@ -63,9 +63,9 @@ export const mockTimeSeries = [
   ...genDaily(10).map(({ label, period, _i }) => ({
     label,
     period,
-    dau: ri(60, 180),
-    wau: ri(160, 360),
-    mau: ri(400, 800),
+    dau: randomIntInclusive(60, 180),
+    wau: randomIntInclusive(160, 360),
+    mau: randomIntInclusive(400, 800),
     team: cyc(TEAMS, _i + 3),
     dept: cyc(DEPTS, _i + 2),
     region: cyc(REGIONS, _i),
@@ -79,18 +79,18 @@ export const mockTimeSeries = [
 export const mockModuleUsage = [
   // Monthly aggregation per module/segment
   ...FEATURES.map((f, i) => ({
-    module: f, count: ri(150, 500), dept: cyc(DEPTS, i), team: cyc(TEAMS, i + 1), region: cyc(REGIONS, i + 2), period: "monthly"
+    module: f, count: randomIntInclusive(150, 500), dept: cyc(DEPTS, i), team: cyc(TEAMS, i + 1), region: cyc(REGIONS, i + 2), period: "monthly"
   })),
   // Weekly slices to satisfy weekly filter combinations
   ...FEATURES.flatMap((f, fi) =>
     genWeekly(6).map(({ label, period, _i }) => ({
-      module: f, count: ri(30, 120), dept: cyc(DEPTS, fi + _i), team: cyc(TEAMS, fi + _i + 2), region: cyc(REGIONS, fi + _i + 1), period, label
+      module: f, count: randomIntInclusive(30, 120), dept: cyc(DEPTS, fi + _i), team: cyc(TEAMS, fi + _i + 2), region: cyc(REGIONS, fi + _i + 1), period, label
     }))
   ),
   // Daily slices for completeness
   ...FEATURES.flatMap((f, fi) =>
     genDaily(7).map(({ label, period, _i }) => ({
-      module: f, count: ri(10, 60), dept: cyc(DEPTS, fi + _i + 1), team: cyc(TEAMS, fi + _i), region: cyc(REGIONS, fi + _i + 2), period, label
+      module: f, count: randomIntInclusive(10, 60), dept: cyc(DEPTS, fi + _i + 1), team: cyc(TEAMS, fi + _i), region: cyc(REGIONS, fi + _i + 2), period, label
     }))
   ),
 ];
@@ -100,12 +100,12 @@ export const mockModuleUsage = [
  * Department growth trend with per-period expansion.
  */
 export const mockDepartments = [
-  ...DEPTS.map((d, i) => ({ dept: d, growth: ri(8, 22), region: cyc(REGIONS, i), period: "monthly" })),
+  ...DEPTS.map((d, i) => ({ dept: d, growth: randomIntInclusive(8, 22), region: cyc(REGIONS, i), period: "monthly" })),
   ...DEPTS.flatMap((d, di) =>
-    genWeekly(6).map(({ label, period, _i }) => ({ dept: d, region: cyc(REGIONS, di + _i), growth: ri(4, 12), period, label }))
+    genWeekly(6).map(({ label, period, _i }) => ({ dept: d, region: cyc(REGIONS, di + _i), growth: randomIntInclusive(4, 12), period, label }))
   ),
   ...DEPTS.flatMap((d, di) =>
-    genDaily(7).map(({ label, period, _i }) => ({ dept: d, region: cyc(REGIONS, di + _i + 1), growth: ri(2, 8), period, label }))
+    genDaily(7).map(({ label, period, _i }) => ({ dept: d, region: cyc(REGIONS, di + _i + 1), growth: randomIntInclusive(2, 8), period, label }))
   ),
 ];
 
@@ -119,7 +119,7 @@ export const mockDiscoveryFunnel = [
   })),
   ...["Discovered", "Tried", "Adopted", "Retained"].flatMap((stage, si) =>
     genWeekly(6).map(({ label, period, _i }) => ({
-      stage, value: ri(80, 260) - si * 10, team: cyc(TEAMS, _i + si), region: cyc(REGIONS, _i + si + 1), period, label
+      stage, value: randomIntInclusive(80, 260) - si * 10, team: cyc(TEAMS, _i + si), region: cyc(REGIONS, _i + si + 1), period, label
     }))
   ),
 ];
@@ -134,7 +134,7 @@ export const mockEffectiveness = {
     ...genWeekly(10).map(({ label, period, _i }) => ({
       label,
       period,
-      rate: ri(48, 72),
+      rate: randomIntInclusive(48, 72),
       team: cyc(TEAMS, _i),
       dept: cyc(DEPTS, _i + 1),
       region: cyc(REGIONS, _i + 2),
@@ -142,7 +142,7 @@ export const mockEffectiveness = {
     ...genMonthly(6).map(({ label, period, _i }) => ({
       label,
       period,
-      rate: ri(50, 70),
+      rate: randomIntInclusive(50, 70),
       team: cyc(TEAMS, _i + 2),
       dept: cyc(DEPTS, _i),
       region: cyc(REGIONS, _i + 1),
@@ -160,10 +160,10 @@ export const mockCreditUtilization = { used: 6400, limit: 10000 };
 export const mockTopUsersCredits = [
   // Monthly summary
   ...USERS.slice(0, 6).map((u, i) => {
-    const used = ri(400, 980);
+    const used = randomIntInclusive(400, 980);
     const limit = 1000;
     const balance = Math.max(0, limit - used);
-    const cost = Number((used * 0.13 + ri(10, 40)).toFixed(1));
+    const cost = Number((used * 0.13 + randomIntInclusive(10, 40)).toFixed(1));
     return {
       user: u, team: cyc(TEAMS, i), used, balance, cost, dept: cyc(DEPTS, i + 1), region: cyc(REGIONS, i + 2), period: "monthly"
     };
@@ -171,7 +171,7 @@ export const mockTopUsersCredits = [
   // Weekly slices
   ...USERS.slice(0, 4).flatMap((u, ui) =>
     genWeekly(6).map(({ label, period, _i }) => {
-      const used = ri(100, 280);
+      const used = randomIntInclusive(100, 280);
       return {
         user: u, team: cyc(TEAMS, ui + _i), used, balance: Math.max(0, 300 - used), cost: Number((used * 0.12).toFixed(1)),
         dept: cyc(DEPTS, ui + _i + 1), region: cyc(REGIONS, ui + _i + 2), period, label
@@ -187,9 +187,9 @@ export const mockLicenseUtilization = { used: 78, total: 100 };
  * Team adoption scores with period expansions.
  */
 export const mockTeamAdoption = [
-  ...TEAMS.map((t, i) => ({ team: t, score: ri(50, 92), dept: cyc(DEPTS, i), region: cyc(REGIONS, i + 1), period: "monthly" })),
+  ...TEAMS.map((t, i) => ({ team: t, score: randomIntInclusive(50, 92), dept: cyc(DEPTS, i), region: cyc(REGIONS, i + 1), period: "monthly" })),
   ...TEAMS.slice(0, 4).flatMap((t, ti) =>
-    genWeekly(6).map(({ label, period, _i }) => ({ team: t, score: ri(45, 90), dept: cyc(DEPTS, ti + _i), region: cyc(REGIONS, ti + _i + 1), period, label }))
+    genWeekly(6).map(({ label, period, _i }) => ({ team: t, score: randomIntInclusive(45, 90), dept: cyc(DEPTS, ti + _i), region: cyc(REGIONS, ti + _i + 1), period, label }))
   ),
 ];
 
@@ -197,7 +197,7 @@ export const mockSupportTrend = [
   ...genWeekly(8).map(({ label, period, _i }) => ({
     label,
     period,
-    tickets: ri(18, 60),
+    tickets: randomIntInclusive(18, 60),
     team: cyc(TEAMS, _i),
     dept: cyc(DEPTS, _i),
     region: cyc(REGIONS, _i + 1),
@@ -205,7 +205,7 @@ export const mockSupportTrend = [
   ...genMonthly(6).map(({ label, period, _i }) => ({
     label,
     period,
-    tickets: ri(120, 240),
+    tickets: randomIntInclusive(120, 240),
     team: cyc(TEAMS, _i + 2),
     dept: cyc(DEPTS, _i + 1),
     region: cyc(REGIONS, _i),
@@ -217,9 +217,9 @@ export const mockSupportTrend = [
  * Feature adoption percentages with extra period data.
  */
 export const mockTrainingFeatureAdoption = [
-  ...FEATURES.map((feature, i) => ({ feature, percent: ri(40, 80), team: cyc(TEAMS, i), dept: cyc(DEPTS, i + 1), region: cyc(REGIONS, i + 2), period: "monthly" })),
+  ...FEATURES.map((feature, i) => ({ feature, percent: randomIntInclusive(40, 80), team: cyc(TEAMS, i), dept: cyc(DEPTS, i + 1), region: cyc(REGIONS, i + 2), period: "monthly" })),
   ...FEATURES.flatMap((feature, fi) =>
-    genWeekly(6).map(({ label, period, _i }) => ({ feature, percent: ri(30, 85), team: cyc(TEAMS, fi + _i), dept: cyc(DEPTS, fi + _i + 1), region: cyc(REGIONS, fi + _i + 2), period, label }))
+    genWeekly(6).map(({ label, period, _i }) => ({ feature, percent: randomIntInclusive(30, 85), team: cyc(TEAMS, fi + _i), dept: cyc(DEPTS, fi + _i + 1), region: cyc(REGIONS, fi + _i + 2), period, label }))
   ),
 ];
 
@@ -229,7 +229,7 @@ export const mockRollout = {
     ...genDaily(10).map(({ label, period, _i }) => ({
       label,
       period,
-      users: ri(20 + _i * 8, 40 + _i * 12),
+      users: randomIntInclusive(20 + _i * 8, 40 + _i * 12),
       team: cyc(TEAMS, _i),
       dept: cyc(DEPTS, _i + 1),
       region: cyc(REGIONS, _i + 2),
@@ -248,9 +248,9 @@ export const mockUsageByTime = Array.from({ length: 24 }).map((_, i) => ({
  * Geographic usage with weekly/daily rows for combined filters.
  */
 export const mockGeoUsage = [
-  ...REGIONS.map((r, i) => ({ region: r, count: ri(300, 600), dept: cyc(DEPTS, i), team: cyc(TEAMS, i + 1), period: "monthly" })),
+  ...REGIONS.map((r, i) => ({ region: r, count: randomIntInclusive(300, 600), dept: cyc(DEPTS, i), team: cyc(TEAMS, i + 1), period: "monthly" })),
   ...REGIONS.flatMap((r, ri) =>
-    genWeekly(6).map(({ label, period, _i }) => ({ region: r, count: ri(40, 120), dept: cyc(DEPTS, ri + _i), team: cyc(TEAMS, ri + _i + 2), period, label }))
+    genWeekly(6).map(({ label, period, _i }) => ({ region: r, count: randomIntInclusive(40, 120), dept: cyc(DEPTS, ri + _i), team: cyc(TEAMS, ri + _i + 2), period, label }))
   ),
 ];
 
@@ -262,15 +262,15 @@ export const mockFeedbackFunnel = [
     { stage: "Completed", v: 350, d: "Support" },
   ].map((s, i) => ({ stage: s.stage, value: s.v, dept: s.d, region: cyc(REGIONS, i), period: "monthly" })),
   ...["Started", "In Progress", "Review", "Completed"].flatMap((stage, si) =>
-    genWeekly(6).map(({ label, period, _i }) => ({ stage, value: ri(60, 260) - si * 10, dept: cyc(DEPTS, si + _i), region: cyc(REGIONS, si + _i + 1), period, label }))
+    genWeekly(6).map(({ label, period, _i }) => ({ stage, value: randomIntInclusive(60, 260) - si * 10, dept: cyc(DEPTS, si + _i), region: cyc(REGIONS, si + _i + 1), period, label }))
   ),
 ];
 
 export const mockAdminOnly = {
   roiByDept: DEPTS.map((d, i) => ({ dept: d, roi: Number((1.3 + (i % 3) * 0.4 + Math.random() * 0.3).toFixed(2)) })),
   latencyMs: [
-    ...genMonthly(12).map(({ label }) => ({ label, p95: ri(180, 240) })),
-    ...genWeekly(6).map(({ label }) => ({ label, p95: ri(190, 260) })),
+    ...genMonthly(12).map(({ label }) => ({ label, p95: randomIntInclusive(180, 240) })),
+    ...genWeekly(6).map(({ label }) => ({ label, p95: randomIntInclusive(190, 260) })),
   ],
   churnRisk: TEAMS.slice(0, 4).map((t) => ({ team: t, risk: Number((0.1 + Math.random() * 0.18).toFixed(2)) })),
 };
@@ -294,7 +294,7 @@ export const mockTeamFeatureHeatmap = {
   teams: TEAMS,
   features: FEATURES,
   values: Array.from({ length: TEAMS.length }).map((_, ti) =>
-    Array.from({ length: FEATURES.length }).map((__, fi) => ri(12, 98) - (ti % 2 === 0 ? 0 : 3) + (fi % 2 === 0 ? 4 : 0))
+    Array.from({ length: FEATURES.length }).map((__, fi) => randomIntInclusive(12, 98) - (ti % 2 === 0 ? 0 : 3) + (fi % 2 === 0 ? 4 : 0))
   ),
 };
 
@@ -321,12 +321,12 @@ export const mockNetwork = {
  */
 export const mockOnboarding = [
   ...USERS.slice(0, 6).map((u, i) => ({
-    user: u, team: cyc(TEAMS, i), progress: ri(20, 92), milestone: ["Intro", "Tutorials", "Quizzes", "Walkthrough"][i % 4],
+    user: u, team: cyc(TEAMS, i), progress: randomIntInclusive(20, 92), milestone: ["Intro", "Tutorials", "Quizzes", "Walkthrough"][i % 4],
     dept: cyc(DEPTS, i + 1), region: cyc(REGIONS, i + 2), period: "monthly"
   })),
   ...USERS.slice(0, 4).flatMap((u, ui) =>
     genWeekly(4).map(({ label, period, _i }) => ({
-      user: u, team: cyc(TEAMS, ui + _i), progress: ri(10, 90), milestone: ["Intro", "Tutorials", "Quizzes", "Walkthrough"][(_i + ui) % 4],
+      user: u, team: cyc(TEAMS, ui + _i), progress: randomIntInclusive(10, 90), milestone: ["Intro", "Tutorials", "Quizzes", "Walkthrough"][(_i + ui) % 4],
       dept: cyc(DEPTS, ui + _i + 1), region: cyc(REGIONS, ui + _i + 2), period, label
     }))
   ),
@@ -396,10 +396,10 @@ export const mockWorkflowFunnels = [
   ...TEAMS.slice(0, 3).flatMap((t, ti) =>
     genWeekly(4).map(({ label, period, _i }) => ({
       team: t,
-      start: ri(200, 400),
-      stage1: ri(150, 300),
-      stage2: ri(100, 220),
-      done: ri(80, 180),
+      start: randomIntInclusive(200, 400),
+      stage1: randomIntInclusive(150, 300),
+      stage2: randomIntInclusive(100, 220),
+      done: randomIntInclusive(80, 180),
       dept: cyc(DEPTS, ti + _i),
       period,
       label
@@ -408,9 +408,9 @@ export const mockWorkflowFunnels = [
 ];
 
 export const mockCostAllocations = [
-  ...TEAMS.slice(0, 5).map((t, i) => ({ entity: t, credits: ri(1600, 3000), limit: ri(2400, 3600), cost: Number(ri(200, 420) + Math.random()).toFixed(1) * 1, dept: cyc(DEPTS, i), period: "monthly" })),
+  ...TEAMS.slice(0, 5).map((t, i) => ({ entity: t, credits: randomIntInclusive(1600, 3000), limit: randomIntInclusive(2400, 3600), cost: Number(randomIntInclusive(200, 420) + Math.random()).toFixed(1) * 1, dept: cyc(DEPTS, i), period: "monthly" })),
   ...TEAMS.slice(0, 3).flatMap((t, ti) =>
-    genWeekly(4).map(({ label, period, _i }) => ({ entity: t, credits: ri(400, 900), limit: ri(800, 1200), cost: Number((ri(60, 140) + Math.random()).toFixed(1)), dept: cyc(DEPTS, ti + _i), period, label }))
+    genWeekly(4).map(({ label, period, _i }) => ({ entity: t, credits: randomIntInclusive(400, 900), limit: randomIntInclusive(800, 1200), cost: Number((randomIntInclusive(60, 140) + Math.random()).toFixed(1)), dept: cyc(DEPTS, ti + _i), period, label }))
   ),
 ];
 
@@ -423,6 +423,6 @@ export const mockGeoCompliance = [
   { region: "APAC-NE", usage: 220, compliant: false, period: "monthly" },
   // Weekly entries to satisfy time filter
   ...["US-East", "EU-West", "APAC-SE"].flatMap((r, i) =>
-    genWeekly(4).map(({ label, period, _i }) => ({ region: r, usage: ri(80, 200), compliant: i !== 2, period, label }))
+    genWeekly(4).map(({ label, period, _i }) => ({ region: r, usage: randomIntInclusive(80, 200), compliant: i !== 2, period, label }))
   ),
 ];
