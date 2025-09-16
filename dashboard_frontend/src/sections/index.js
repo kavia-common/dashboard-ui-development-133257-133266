@@ -544,15 +544,54 @@ export function UsagePatterns() {
         </div>
       </Card>
       <Card title="Geo Compliance" subtitle="Region compliance status">
-        <div className="text-xs text-slate-500 dark:text-slate-400 mb-2">Map placeholder</div>
-        <SimpleTable
-          columns={[
-            { key: "region", header: "Region" },
-            { key: "usage", header: "Usage" },
-            { key: "compliant", header: "Compliant", render: (v) => (v ? "✅" : "⚠️") },
-          ]}
-          rows={mockGeoCompliance}
-        />
+        {/* Assumption: Until a geo map is integrated, visualize compliance via donut + per-region bars.
+            Replace with real map and API-fed metrics when available. */}
+        <div className="grid grid-cols-1 gap-4">
+          {/* Donut for overall compliance ratio */}
+          <div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 mb-1">Overall Compliance</div>
+            {(() => {
+              const totalUsage = mockGeoCompliance.reduce((a, b) => a + b.usage, 0) || 1;
+              const compliantUsage = mockGeoCompliance.filter(r => r.compliant).reduce((a, b) => a + b.usage, 0);
+              const nonCompliantUsage = totalUsage - compliantUsage;
+              return (
+                <PieChartLike
+                  parts={[
+                    { label: "Compliant", value: compliantUsage, color: "#10b981" },
+                    { label: "Non-compliant", value: nonCompliantUsage, color: "#ef4444" },
+                  ]}
+                />
+              );
+            })()}
+          </div>
+
+          {/* Per-region compliance bars */}
+          <div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 mb-1">By Region</div>
+            <BarChartLike
+              data={mockGeoCompliance.map(d => ({
+                label: d.region,
+                // Weight compliant regions slightly higher color intensity (visual hint)
+                count: d.usage
+              }))}
+              xKey="label"
+              yKey="count"
+              color="#3b82f6"
+            />
+          </div>
+
+          {/* Tabular details */}
+          <div aria-label="Geo compliance table" role="region">
+            <SimpleTable
+              columns={[
+                { key: "region", header: "Region" },
+                { key: "usage", header: "Usage" },
+                { key: "compliant", header: "Compliant", render: (v) => (v ? "✅" : "⚠️") },
+              ]}
+              rows={mockGeoCompliance}
+            />
+          </div>
+        </div>
       </Card>
     </div>
   );
