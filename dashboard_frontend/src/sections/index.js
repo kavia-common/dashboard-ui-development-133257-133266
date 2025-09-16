@@ -120,7 +120,7 @@ export function AdoptionEngagement({ rbac, filters }) {
             });
             return (
               <>
-                <BarChartLike data={filtered} xKey="module" yKey="count" color="#3b82f6" />
+                {/* Horizontal bar/status chart removed */}
                 <div aria-label="Module usage table" role="region" className="mt-2">
                   <SimpleTable
                     columns={[
@@ -148,7 +148,7 @@ export function AdoptionEngagement({ rbac, filters }) {
             });
             return (
               <>
-                <BarChartLike data={filtered} xKey="dept" yKey="growth" color="#8b5cf6" />
+                {/* Horizontal bar/status chart removed */}
                 <div aria-label="Department growth table" role="region" className="mt-2">
                   <SimpleTable
                     columns={[
@@ -176,7 +176,7 @@ export function AdoptionEngagement({ rbac, filters }) {
             });
             return (
               <>
-                <BarChartLike data={filtered} xKey="stage" yKey="value" color="#f59e0b" />
+                {/* Horizontal bar/status chart removed */}
                 <div aria-label="Discovery funnel table" role="region" className="mt-2">
                   <SimpleTable
                     columns={[
@@ -425,7 +425,7 @@ export function TrainingAwareness({ filters }) {
             });
             return (
               <>
-                <BarChartLike data={filtered} xKey="label" yKey="tickets" color="#ef4444" />
+                {/* Horizontal bar/status chart removed */}
                 <div aria-label="Support tickets table" role="region">
                   <SimpleTable
                     columns={[
@@ -574,7 +574,7 @@ export function FeedbackProblemDetection({ filters }) {
             });
             return (
               <>
-                <BarChartLike data={filtered} xKey="stage" yKey="value" color="#f59e0b" />
+                {/* Horizontal bar/status chart removed */}
                 <div aria-label="Workflow funnel table" role="region">
                   <SimpleTable
                     columns={[
@@ -826,7 +826,7 @@ export function UsagePatterns({ filters }) {
             });
             return (
               <>
-                <BarChartLike data={filtered.map(({ label, count }) => ({ label, count }))} xKey="label" yKey="count" color="#3b82f6" />
+                {/* Horizontal bar/status chart removed */}
                 <div aria-label="Hourly usage table" role="region">
                   <SimpleTable
                     columns={[
@@ -854,7 +854,7 @@ export function UsagePatterns({ filters }) {
             });
             return (
               <>
-                <BarChartLike data={filtered.map(d => ({ label: d.region, count: d.count }))} xKey="label" yKey="count" color="#8b5cf6" />
+                {/* Horizontal bar/status chart removed */}
                 <div aria-label="Geographic usage table" role="region">
                   <SimpleTable
                     columns={[
@@ -912,15 +912,9 @@ export function UsagePatterns({ filters }) {
                 sortNumericFallbackKey: "usage",
               });
               return (
-                <BarChartLike
-                  data={filtered.map(d => ({
-                    label: d.region,
-                    count: d.usage
-                  }))}
-                  xKey="label"
-                  yKey="count"
-                  color="#3b82f6"
-                />
+                <>
+                  {/* Horizontal bar/status chart removed */}
+                </>
               );
             })()}
           </div>
@@ -1106,7 +1100,7 @@ export function KaviaAdminOnly({ rbac, previewBypass = false, filters }) {
       )}
       <Card title="ROI by Department" subtitle="Admin-only" roleBadge={<RoleBadge minRoles={minRoles} />}>
         <div className="grid grid-cols-1 gap-4">
-          <BarChartLike data={mockAdminOnly.roiByDept.map(r => ({ dept: r.dept, roi: Math.round(r.roi * 100) }))} xKey="dept" yKey="roi" color="#10b981" />
+          {/* Horizontal bar/status chart removed */}
           {(() => {
             const { applyFilters } = require("../utils/dataFilters");
             const base = mockAdminOnly.roiByDept.map(r => ({ dept: r.dept, roi: Math.round(r.roi * 100) }));

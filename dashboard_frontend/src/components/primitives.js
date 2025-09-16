@@ -84,24 +84,13 @@ export function Legend({ items }) {
 
 // PUBLIC_INTERFACE
 export function BarChartLike({ data, xKey, yKey, color = "#3b82f6", maxHeight = 140 }) {
-  /** Lightweight bar chart using divs to simulate bars */
-  const max = Math.max(...data.map((d) => d[yKey] || 0), 1);
+  /**
+   * Removed visual rendering of the horizontal/column status bars as requested.
+   * We return a minimal, accessible placeholder that occupies no height,
+   * ensuring no UI is shown and avoiding layout shifts.
+   */
   return (
-    <div className="w-full">
-      <div className="flex items-end gap-2 h-[140px]" style={{ height: maxHeight }}>
-        {data.map((d, i) => (
-          <div key={i} className="flex-1 group">
-            <div
-              className="w-full rounded-t bg-blue-500/80 dark:bg-blue-400/80 group-hover:opacity-90 transition-opacity"
-              style={{ height: `${((d[yKey] || 0) / max) * 100}%`, backgroundColor: color }}
-              role="img"
-              aria-label={`${d[xKey]}: ${d[yKey]}`}
-            />
-            <div className="text-[10px] text-center mt-1 text-slate-500 dark:text-slate-400">{d[xKey]}</div>
-          </div>
-        ))}
-      </div>
-    </div>
+    <div className="w-full" aria-hidden="true" style={{ height: 0, padding: 0, margin: 0 }} />
   );
 }
 
