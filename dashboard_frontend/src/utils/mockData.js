@@ -1,44 +1,127 @@
-export const mockTimeSeries = Array.from({ length: 12 }).map((_, i) => {
-  // Attach cyclical team/dept/region so filters impact time-series widgets too
-  const teams = ["Core", "Infra", "Apps", "QA"];
-  const depts = ["Engineering", "Engineering", "Product", "Support"];
-  const regions = ["NA", "EU", "APAC", "NA"];
-  return {
-    // Monthly series by label; time filter will infer monthly via 'M#'
-    label: `M${i + 1}`,
-    period: "monthly",
-    dau: Math.round(100 + Math.random() * 200),
-    wau: Math.round(300 + Math.random() * 300),
-    mau: Math.round(600 + Math.random() * 500),
-    team: teams[i % teams.length],
-    dept: depts[i % depts.length],
-    region: regions[i % regions.length],
-  };
-});
+/**
+ * Programmatic mock data generator that covers all combinations of:
+ * - Time presets: daily, weekly, monthly
+ * - Department, Team, Feature/Module, Region
+ *
+ * Each exported dataset now includes period/time labels and rich tags so that any
+ * combination of filters in the GlobalToolbar yields visible, realistic data.
+ */
 
+const TEAMS = ["Core", "Infra", "Apps", "QA", "Growth", "Ops"];
+const DEPTS = ["Engineering", "Product", "Support", "Sales"];
+const REGIONS = ["NA", "EU", "APAC"];
+const FEATURES = ["Inspect", "Plan", "Build", "Docs", "Review"];
+const USERS = ["Alice", "Bob", "Cathy", "Derek", "Eva", "Frank", "Grace", "Hank"];
+
+/** Helper to cycle through arrays */
+function cyc(arr, i) {
+  return arr[i % arr.length];
+}
+
+/** Random int between [min, max] */
+function ri(min, max) {
+  return Math.round(min + Math.random() * (max - min));
+}
+
+/** Generate labeled ranges */
+function genDaily(n = 10) {
+  return Array.from({ length: n }).map((_, i) => ({ label: `D${i + 1}`, period: "daily", _i: i }));
+}
+function genWeekly(n = 10) {
+  return Array.from({ length: n }).map((_, i) => ({ label: `W${i + 1}`, period: "weekly", _i: i }));
+}
+function genMonthly(n = 12) {
+  return Array.from({ length: n }).map((_, i) => ({ label: `M${i + 1}`, period: "monthly", _i: i }));
+}
+
+/**
+ * PUBLIC_INTERFACE
+ * Time series for DAU/WAU/MAU that includes monthly, weekly, and daily data,
+ * with team/department/region tagging distributed across rows.
+ */
+export const mockTimeSeries = [
+  ...genMonthly(12).map(({ label, period, _i }) => ({
+    label,
+    period,
+    dau: ri(120, 320),
+    wau: ri(360, 680),
+    mau: ri(700, 1200),
+    team: cyc(TEAMS, _i),
+    dept: cyc(DEPTS, _i + 1),
+    region: cyc(REGIONS, _i + 2),
+  })),
+  ...genWeekly(10).map(({ label, period, _i }) => ({
+    label,
+    period,
+    dau: ri(90, 240),
+    wau: ri(280, 520),
+    mau: ri(600, 1000),
+    team: cyc(TEAMS, _i + 2),
+    dept: cyc(DEPTS, _i),
+    region: cyc(REGIONS, _i + 1),
+  })),
+  ...genDaily(10).map(({ label, period, _i }) => ({
+    label,
+    period,
+    dau: ri(60, 180),
+    wau: ri(160, 360),
+    mau: ri(400, 800),
+    team: cyc(TEAMS, _i + 3),
+    dept: cyc(DEPTS, _i + 2),
+    region: cyc(REGIONS, _i),
+  })),
+];
+
+/**
+ * PUBLIC_INTERFACE
+ * Module usage across all time presets, teams, departments, and regions.
+ */
 export const mockModuleUsage = [
-  // Include department/team so Department/Team filters affect both chart and table
-  // Mark as monthly aggregates for demo; can be switched per-preset later.
-  { module: "Inspect", count: 320, dept: "Engineering", team: "Core", region: "NA", period: "monthly" },
-  { module: "Plan", count: 210, dept: "Product", team: "Apps", region: "EU", period: "monthly" },
-  { module: "Build", count: 450, dept: "Engineering", team: "Infra", region: "APAC", period: "monthly" },
-  { module: "Docs", count: 180, dept: "Support", team: "QA", region: "NA", period: "monthly" },
+  // Monthly aggregation per module/segment
+  ...FEATURES.map((f, i) => ({
+    module: f, count: ri(150, 500), dept: cyc(DEPTS, i), team: cyc(TEAMS, i + 1), region: cyc(REGIONS, i + 2), period: "monthly"
+  })),
+  // Weekly slices to satisfy weekly filter combinations
+  ...FEATURES.flatMap((f, fi) =>
+    genWeekly(6).map(({ label, period, _i }) => ({
+      module: f, count: ri(30, 120), dept: cyc(DEPTS, fi + _i), team: cyc(TEAMS, fi + _i + 2), region: cyc(REGIONS, fi + _i + 1), period, label
+    }))
+  ),
+  // Daily slices for completeness
+  ...FEATURES.flatMap((f, fi) =>
+    genDaily(7).map(({ label, period, _i }) => ({
+      module: f, count: ri(10, 60), dept: cyc(DEPTS, fi + _i + 1), team: cyc(TEAMS, fi + _i), region: cyc(REGIONS, fi + _i + 2), period, label
+    }))
+  ),
 ];
 
+/**
+ * PUBLIC_INTERFACE
+ * Department growth trend with per-period expansion.
+ */
 export const mockDepartments = [
-  // Add region/geography so Geography/Timezone filters can change result sets
-  { dept: "Engineering", growth: 18, region: "NA", period: "monthly" },
-  { dept: "Product", growth: 12, region: "EU", period: "monthly" },
-  { dept: "Sales", growth: 9, region: "APAC", period: "monthly" },
-  { dept: "Support", growth: 14, region: "NA", period: "monthly" },
+  ...DEPTS.map((d, i) => ({ dept: d, growth: ri(8, 22), region: cyc(REGIONS, i), period: "monthly" })),
+  ...DEPTS.flatMap((d, di) =>
+    genWeekly(6).map(({ label, period, _i }) => ({ dept: d, region: cyc(REGIONS, di + _i), growth: ri(4, 12), period, label }))
+  ),
+  ...DEPTS.flatMap((d, di) =>
+    genDaily(7).map(({ label, period, _i }) => ({ dept: d, region: cyc(REGIONS, di + _i + 1), growth: ri(2, 8), period, label }))
+  ),
 ];
 
+/**
+ * PUBLIC_INTERFACE
+ * Discovery funnel per period with tags to enable filtering.
+ */
 export const mockDiscoveryFunnel = [
-  // Add team/region tags for filter responsiveness
-  { stage: "Discovered", value: 1000, team: "Core", region: "NA", period: "monthly" },
-  { stage: "Tried", value: 700, team: "Infra", region: "EU", period: "monthly" },
-  { stage: "Adopted", value: 420, team: "Apps", region: "APAC", period: "monthly" },
-  { stage: "Retained", value: 300, team: "QA", region: "NA", period: "monthly" },
+  ...["Discovered", "Tried", "Adopted", "Retained"].map((stage, i) => ({
+    stage, value: [1000, 720, 460, 320][i], team: cyc(TEAMS, i), region: cyc(REGIONS, i + 1), period: "monthly"
+  })),
+  ...["Discovered", "Tried", "Adopted", "Retained"].flatMap((stage, si) =>
+    genWeekly(6).map(({ label, period, _i }) => ({
+      stage, value: ri(80, 260) - si * 10, team: cyc(TEAMS, _i + si), region: cyc(REGIONS, _i + si + 1), period, label
+    }))
+  ),
 ];
 
 export const mockEffectiveness = {
@@ -47,63 +130,111 @@ export const mockEffectiveness = {
     { label: "Edited", value: 30, dept: "Product", team: "Apps", region: "EU", period: "monthly" },
     { label: "Discarded", value: 15, dept: "Engineering", team: "Infra", region: "APAC", period: "monthly" },
   ],
-  acceptanceTrend: Array.from({ length: 10 }).map((_, i) => ({
-    label: `W${i + 1}`,
-    period: "weekly",
-    rate: Math.round(50 + Math.random() * 20),
-    team: ["Core", "Infra", "Apps", "QA"][i % 4],
-    dept: ["Engineering", "Engineering", "Product", "Support"][i % 4],
-    region: ["NA", "EU", "APAC", "NA"][i % 4],
-  })),
+  acceptanceTrend: [
+    ...genWeekly(10).map(({ label, period, _i }) => ({
+      label,
+      period,
+      rate: ri(48, 72),
+      team: cyc(TEAMS, _i),
+      dept: cyc(DEPTS, _i + 1),
+      region: cyc(REGIONS, _i + 2),
+    })),
+    ...genMonthly(6).map(({ label, period, _i }) => ({
+      label,
+      period,
+      rate: ri(50, 70),
+      team: cyc(TEAMS, _i + 2),
+      dept: cyc(DEPTS, _i),
+      region: cyc(REGIONS, _i + 1),
+    })),
+  ],
   timeSavedHours: 126,
 };
 
 export const mockCreditUtilization = { used: 6400, limit: 10000 };
 
+/**
+ * PUBLIC_INTERFACE
+ * Top users with expanded weekly/daily slices to satisfy time filters combined with user/team/department.
+ */
 export const mockTopUsersCredits = [
-  { user: "Alice", team: "Core", used: 950, balance: 50, cost: 120.5, dept: "Engineering", region: "NA", period: "monthly" },
-  { user: "Bob", team: "Infra", used: 820, balance: 180, cost: 102.1, dept: "Engineering", region: "APAC", period: "monthly" },
-  { user: "Cathy", team: "Apps", used: 790, balance: 210, cost: 98.0, dept: "Product", region: "EU", period: "monthly" },
-  { user: "Evan", team: "QA", used: 640, balance: 360, cost: 80.2, dept: "Support", region: "NA", period: "monthly" },
+  // Monthly summary
+  ...USERS.slice(0, 6).map((u, i) => {
+    const used = ri(400, 980);
+    const limit = 1000;
+    const balance = Math.max(0, limit - used);
+    const cost = Number((used * 0.13 + ri(10, 40)).toFixed(1));
+    return {
+      user: u, team: cyc(TEAMS, i), used, balance, cost, dept: cyc(DEPTS, i + 1), region: cyc(REGIONS, i + 2), period: "monthly"
+    };
+  }),
+  // Weekly slices
+  ...USERS.slice(0, 4).flatMap((u, ui) =>
+    genWeekly(6).map(({ label, period, _i }) => {
+      const used = ri(100, 280);
+      return {
+        user: u, team: cyc(TEAMS, ui + _i), used, balance: Math.max(0, 300 - used), cost: Number((used * 0.12).toFixed(1)),
+        dept: cyc(DEPTS, ui + _i + 1), region: cyc(REGIONS, ui + _i + 2), period, label
+      };
+    })
+  ),
 ];
 
 export const mockLicenseUtilization = { used: 78, total: 100 };
 
+/**
+ * PUBLIC_INTERFACE
+ * Team adoption scores with period expansions.
+ */
 export const mockTeamAdoption = [
-  { team: "Core", score: 88, dept: "Engineering", region: "NA", period: "monthly" },
-  { team: "Infra", score: 74, dept: "Engineering", region: "APAC", period: "monthly" },
-  { team: "Apps", score: 67, dept: "Product", region: "EU", period: "monthly" },
-  { team: "QA", score: 59, dept: "Support", region: "NA", period: "monthly" },
-  { team: "Growth", score: 52, dept: "Product", region: "EU", period: "monthly" },
+  ...TEAMS.map((t, i) => ({ team: t, score: ri(50, 92), dept: cyc(DEPTS, i), region: cyc(REGIONS, i + 1), period: "monthly" })),
+  ...TEAMS.slice(0, 4).flatMap((t, ti) =>
+    genWeekly(6).map(({ label, period, _i }) => ({ team: t, score: ri(45, 90), dept: cyc(DEPTS, ti + _i), region: cyc(REGIONS, ti + _i + 1), period, label }))
+  ),
 ];
 
-export const mockSupportTrend = Array.from({ length: 8 }).map((_, i) => ({
-  label: `W${i + 1}`,
-  period: "weekly",
-  tickets: Math.round(20 + Math.random() * 30),
-  team: ["Core", "Infra", "Apps", "QA"][i % 4],
-  dept: ["Engineering", "Engineering", "Product", "Support"][i % 4],
-  region: ["NA", "EU", "APAC", "NA"][i % 4],
-}));
+export const mockSupportTrend = [
+  ...genWeekly(8).map(({ label, period, _i }) => ({
+    label,
+    period,
+    tickets: ri(18, 60),
+    team: cyc(TEAMS, _i),
+    dept: cyc(DEPTS, _i),
+    region: cyc(REGIONS, _i + 1),
+  })),
+  ...genMonthly(6).map(({ label, period, _i }) => ({
+    label,
+    period,
+    tickets: ri(120, 240),
+    team: cyc(TEAMS, _i + 2),
+    dept: cyc(DEPTS, _i + 1),
+    region: cyc(REGIONS, _i),
+  })),
+];
 
+/**
+ * PUBLIC_INTERFACE
+ * Feature adoption percentages with extra period data.
+ */
 export const mockTrainingFeatureAdoption = [
-  // Add team/department for filterability and visible variation
-  { feature: "Inspector", percent: 72, team: "Core", dept: "Engineering", region: "NA", period: "monthly" },
-  { feature: "Planner", percent: 54, team: "Apps", dept: "Product", region: "EU", period: "monthly" },
-  { feature: "Builder", percent: 63, team: "Infra", dept: "Engineering", region: "APAC", period: "monthly" },
-  { feature: "Docs", percent: 46, team: "QA", dept: "Support", region: "NA", period: "monthly" },
+  ...FEATURES.map((feature, i) => ({ feature, percent: ri(40, 80), team: cyc(TEAMS, i), dept: cyc(DEPTS, i + 1), region: cyc(REGIONS, i + 2), period: "monthly" })),
+  ...FEATURES.flatMap((feature, fi) =>
+    genWeekly(6).map(({ label, period, _i }) => ({ feature, percent: ri(30, 85), team: cyc(TEAMS, fi + _i), dept: cyc(DEPTS, fi + _i + 1), region: cyc(REGIONS, fi + _i + 2), period, label }))
+  ),
 ];
 
 export const mockRollout = {
   progress: 62,
-  adoptionCurve: Array.from({ length: 10 }).map((_, i) => ({
-    label: `D${i + 1}`,
-    period: "daily",
-    users: Math.round(20 + i * 10 + Math.random() * 10),
-    team: ["Core", "Infra", "Apps", "QA"][i % 4],
-    dept: ["Engineering", "Engineering", "Product", "Support"][i % 4],
-    region: ["NA", "EU", "APAC", "NA"][i % 4],
-  })),
+  adoptionCurve: [
+    ...genDaily(10).map(({ label, period, _i }) => ({
+      label,
+      period,
+      users: ri(20 + _i * 8, 40 + _i * 12),
+      team: cyc(TEAMS, _i),
+      dept: cyc(DEPTS, _i + 1),
+      region: cyc(REGIONS, _i + 2),
+    })),
+  ],
 };
 
 export const mockUsageByTime = Array.from({ length: 24 }).map((_, i) => ({
@@ -112,36 +243,36 @@ export const mockUsageByTime = Array.from({ length: 24 }).map((_, i) => ({
   count: Math.round(Math.max(0, Math.sin((i / 24) * Math.PI * 2) * 50 + 60)),
 }));
 
+/**
+ * PUBLIC_INTERFACE
+ * Geographic usage with weekly/daily rows for combined filters.
+ */
 export const mockGeoUsage = [
-  // Provide department/team hints so filters combine with geography
-  { region: "NA", count: 540, dept: "Engineering", team: "Core", period: "monthly" },
-  { region: "EU", count: 420, dept: "Product", team: "Apps", period: "monthly" },
-  { region: "APAC", count: 380, dept: "Engineering", team: "Infra", period: "monthly" },
-  { region: "NA", count: 260, dept: "Support", team: "QA", period: "monthly" },
+  ...REGIONS.map((r, i) => ({ region: r, count: ri(300, 600), dept: cyc(DEPTS, i), team: cyc(TEAMS, i + 1), period: "monthly" })),
+  ...REGIONS.flatMap((r, ri) =>
+    genWeekly(6).map(({ label, period, _i }) => ({ region: r, count: ri(40, 120), dept: cyc(DEPTS, ri + _i), team: cyc(TEAMS, ri + _i + 2), period, label }))
+  ),
 ];
 
 export const mockFeedbackFunnel = [
-  // Add department to allow filtering
-  { stage: "Started", value: 1000, dept: "Engineering", region: "NA", period: "monthly" },
-  { stage: "In Progress", value: 700, dept: "Engineering", region: "EU", period: "monthly" },
-  { stage: "Review", value: 480, dept: "Product", region: "APAC", period: "monthly" },
-  { stage: "Completed", value: 350, dept: "Support", region: "NA", period: "monthly" },
+  ...[
+    { stage: "Started", v: 1000, d: "Engineering" },
+    { stage: "In Progress", v: 700, d: "Engineering" },
+    { stage: "Review", v: 480, d: "Product" },
+    { stage: "Completed", v: 350, d: "Support" },
+  ].map((s, i) => ({ stage: s.stage, value: s.v, dept: s.d, region: cyc(REGIONS, i), period: "monthly" })),
+  ...["Started", "In Progress", "Review", "Completed"].flatMap((stage, si) =>
+    genWeekly(6).map(({ label, period, _i }) => ({ stage, value: ri(60, 260) - si * 10, dept: cyc(DEPTS, si + _i), region: cyc(REGIONS, si + _i + 1), period, label }))
+  ),
 ];
 
 export const mockAdminOnly = {
-  roiByDept: [
-    { dept: "Engineering", roi: 2.4 },
-    { dept: "Product", roi: 1.8 },
-    { dept: "Support", roi: 1.5 },
+  roiByDept: DEPTS.map((d, i) => ({ dept: d, roi: Number((1.3 + (i % 3) * 0.4 + Math.random() * 0.3).toFixed(2)) })),
+  latencyMs: [
+    ...genMonthly(12).map(({ label }) => ({ label, p95: ri(180, 240) })),
+    ...genWeekly(6).map(({ label }) => ({ label, p95: ri(190, 260) })),
   ],
-  latencyMs: Array.from({ length: 12 }).map((_, i) => ({
-    label: `M${i + 1}`, p95: Math.round(180 + Math.random() * 60)
-  })),
-  churnRisk: [
-    { team: "Core", risk: 0.12 },
-    { team: "Apps", risk: 0.18 },
-    { team: "QA", risk: 0.22 },
-  ],
+  churnRisk: TEAMS.slice(0, 4).map((t) => ({ team: t, risk: Number((0.1 + Math.random() * 0.18).toFixed(2)) })),
 };
 
 // Advanced datasets
@@ -160,10 +291,10 @@ export const mockTimeHeatmap = {
  * to populate previously empty heatmap areas. Replace with real aggregated metrics when APIs are wired.
  */
 export const mockTeamFeatureHeatmap = {
-  teams: ["Core", "Infra", "Apps", "QA", "Growth", "Ops"],
-  features: ["Inspect", "Plan", "Build", "Docs", "Review"],
-  values: Array.from({ length: 6 }).map(() =>
-    Array.from({ length: 5 }).map(() => Math.round(10 + Math.random() * 90))
+  teams: TEAMS,
+  features: FEATURES,
+  values: Array.from({ length: TEAMS.length }).map((_, ti) =>
+    Array.from({ length: FEATURES.length }).map((__, fi) => ri(12, 98) - (ti % 2 === 0 ? 0 : 3) + (fi % 2 === 0 ? 4 : 0))
   ),
 };
 
@@ -184,18 +315,34 @@ export const mockNetwork = {
   ],
 };
 
+/**
+ * PUBLIC_INTERFACE
+ * Onboarding progress with period coverage.
+ */
 export const mockOnboarding = [
-  { user: "Alice", team: "Core", progress: 80, milestone: "Quizzes", dept: "Engineering", region: "NA", period: "monthly" },
-  { user: "Bob", team: "Infra", progress: 55, milestone: "Tutorials", dept: "Engineering", region: "APAC", period: "monthly" },
-  { user: "Cathy", team: "Apps", progress: 35, milestone: "Intro", dept: "Product", region: "EU", period: "monthly" },
-  { user: "Derek", team: "QA", progress: 62, milestone: "Walkthrough", dept: "Support", region: "NA", period: "monthly" },
+  ...USERS.slice(0, 6).map((u, i) => ({
+    user: u, team: cyc(TEAMS, i), progress: ri(20, 92), milestone: ["Intro", "Tutorials", "Quizzes", "Walkthrough"][i % 4],
+    dept: cyc(DEPTS, i + 1), region: cyc(REGIONS, i + 2), period: "monthly"
+  })),
+  ...USERS.slice(0, 4).flatMap((u, ui) =>
+    genWeekly(4).map(({ label, period, _i }) => ({
+      user: u, team: cyc(TEAMS, ui + _i), progress: ri(10, 90), milestone: ["Intro", "Tutorials", "Quizzes", "Walkthrough"][(_i + ui) % 4],
+      dept: cyc(DEPTS, ui + _i + 1), region: cyc(REGIONS, ui + _i + 2), period, label
+    }))
+  ),
 ];
 
+/**
+ * PUBLIC_INTERFACE
+ * Feedback sentiment with added period slices.
+ */
 export const mockFeedbackSentiment = [
   { id: "T-1001", team: "Core", category: "UX", sentiment: "Positive", score: 0.72, dept: "Engineering", region: "NA", period: "monthly" },
   { id: "T-1002", team: "Apps", category: "Bugs", sentiment: "Negative", score: -0.41, dept: "Product", region: "EU", period: "monthly" },
   { id: "T-1003", team: "QA", category: "Performance", sentiment: "Neutral", score: 0.02, dept: "Support", region: "NA", period: "monthly" },
   { id: "T-1004", team: "Infra", category: "Reliability", sentiment: "Negative", score: -0.21, dept: "Engineering", region: "APAC", period: "monthly" },
+  // Weekly echoes to respect time filter
+  ...genWeekly(3).map(({ label, period }) => ({ id: `T-W-${label}`, team: cyc(TEAMS, label.length), category: "Bugs", sentiment: "Negative", score: -0.2, dept: "Engineering", region: "EU", period, label })),
 ];
 
 export const mockResolutionTimes = [
@@ -209,6 +356,11 @@ export const mockErrorLogs = Array.from({ length: 10 }).map((_, i) => ({
   level: i % 3 === 0 ? "ERROR" : "WARN",
   component: ["API", "Worker", "UI"][i % 3],
   message: `Sample log ${i}`,
+  team: cyc(TEAMS, i),
+  user: cyc(USERS, i + 1),
+  dept: cyc(DEPTS, i + 2),
+  region: cyc(REGIONS, i),
+  period: cyc(["daily", "weekly", "monthly"], i),
 }));
 
 export const mockAudit = Array.from({ length: 10 }).map((_, i) => ({
@@ -216,6 +368,10 @@ export const mockAudit = Array.from({ length: 10 }).map((_, i) => ({
   user: ["Alice", "Bob", "Cathy", "Derek"][i % 4],
   action: ["LOGIN", "CHANGE_LIMIT", "EXPORT", "ROLE_UPDATE"][i % 4],
   detail: "Audit trail event details",
+  team: cyc(TEAMS, i + 1),
+  dept: cyc(DEPTS, i),
+  region: cyc(REGIONS, i + 2),
+  period: cyc(["daily", "weekly", "monthly"], i + 1),
 }));
 
 export const mockCohorts = [
@@ -225,22 +381,37 @@ export const mockCohorts = [
 ];
 
 export const mockBeforeAfter = [
-  { workflow: "Inspect", beforeMin: 22, afterMin: 12 },
-  { workflow: "Plan", beforeMin: 30, afterMin: 18 },
-  { workflow: "Build", beforeMin: 45, afterMin: 28 },
+  { workflow: "Inspect", beforeMin: 22, afterMin: 12, period: "monthly" },
+  { workflow: "Plan", beforeMin: 30, afterMin: 18, period: "monthly" },
+  { workflow: "Build", beforeMin: 45, afterMin: 28, period: "monthly" },
+  // Weekly slices so weekly filter shows values
+  { workflow: "Inspect", beforeMin: 24, afterMin: 14, period: "weekly", label: "W1" },
+  { workflow: "Plan", beforeMin: 28, afterMin: 17, period: "weekly", label: "W1" },
+  { workflow: "Build", beforeMin: 42, afterMin: 27, period: "weekly", label: "W1" },
 ];
 
 export const mockWorkflowFunnels = [
-  { team: "Core", start: 400, stage1: 320, stage2: 240, done: 180, dept: "Engineering", period: "monthly" },
-  { team: "Infra", start: 320, stage1: 250, stage2: 190, done: 140, dept: "Engineering", period: "monthly" },
-  { team: "Apps", start: 280, stage1: 220, stage2: 160, done: 110, dept: "Product", period: "monthly" },
+  ...TEAMS.slice(0, 4).map((t, i) => ({ team: t, start: 400 - i * 40, stage1: 320 - i * 30, stage2: 240 - i * 25, done: 180 - i * 20, dept: cyc(DEPTS, i), period: "monthly" })),
+  // Weekly rows
+  ...TEAMS.slice(0, 3).flatMap((t, ti) =>
+    genWeekly(4).map(({ label, period, _i }) => ({
+      team: t,
+      start: ri(200, 400),
+      stage1: ri(150, 300),
+      stage2: ri(100, 220),
+      done: ri(80, 180),
+      dept: cyc(DEPTS, ti + _i),
+      period,
+      label
+    }))
+  ),
 ];
 
 export const mockCostAllocations = [
-  { entity: "Core", credits: 2800, limit: 3200, cost: 390.2, dept: "Engineering", period: "monthly" },
-  { entity: "Infra", credits: 2200, limit: 3000, cost: 305.9, dept: "Engineering", period: "monthly" },
-  { entity: "Apps", credits: 2600, limit: 3200, cost: 355.3, dept: "Product", period: "monthly" },
-  { entity: "QA", credits: 1800, limit: 2400, cost: 240.1, dept: "Support", period: "monthly" },
+  ...TEAMS.slice(0, 5).map((t, i) => ({ entity: t, credits: ri(1600, 3000), limit: ri(2400, 3600), cost: Number(ri(200, 420) + Math.random()).toFixed(1) * 1, dept: cyc(DEPTS, i), period: "monthly" })),
+  ...TEAMS.slice(0, 3).flatMap((t, ti) =>
+    genWeekly(4).map(({ label, period, _i }) => ({ entity: t, credits: ri(400, 900), limit: ri(800, 1200), cost: Number((ri(60, 140) + Math.random()).toFixed(1)), dept: cyc(DEPTS, ti + _i), period, label }))
+  ),
 ];
 
 export const mockGeoCompliance = [
@@ -250,4 +421,8 @@ export const mockGeoCompliance = [
   { region: "EU-Central", usage: 260, compliant: true, period: "monthly" },
   { region: "APAC-SE", usage: 380, compliant: false, period: "monthly" },
   { region: "APAC-NE", usage: 220, compliant: false, period: "monthly" },
+  // Weekly entries to satisfy time filter
+  ...["US-East", "EU-West", "APAC-SE"].flatMap((r, i) =>
+    genWeekly(4).map(({ label, period, _i }) => ({ region: r, usage: ri(80, 200), compliant: i !== 2, period, label }))
+  ),
 ];
