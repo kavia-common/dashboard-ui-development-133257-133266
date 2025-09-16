@@ -36,7 +36,9 @@ function App() {
     user: "",
     feature: "",
     workflow: "",
-    geography: ""
+    geography: "",
+    search: "",
+    sort: { by: "", dir: "desc" }
   });
 
   // Placeholder: roles would come from auth context
@@ -87,7 +89,7 @@ function App() {
         }
       }}
       onSearch={(q) => {
-        console.log("Search query:", q);
+        setFilters((f) => ({ ...f, search: q || "" }));
       }}
       roleQuickFilter={rbac.roles.join(", ")}
       exportTargetRef={mainExportTargetRef}
@@ -97,33 +99,33 @@ function App() {
   const renderSection = () => {
     switch (current) {
       case "adoption":
-        return <AdoptionEngagement rbac={rbac} />;
+        return <AdoptionEngagement rbac={rbac} filters={filters} />;
       case "effectiveness":
-        return <Effectiveness rbac={rbac} />;
+        return <Effectiveness rbac={rbac} filters={filters} />;
       case "training":
-        return <TrainingAwareness />;
+        return <TrainingAwareness filters={filters} />;
       case "org":
-        return <OrganizationalMetrics />;
+        return <OrganizationalMetrics filters={filters} />;
       case "feedback":
-        return <FeedbackProblemDetection />;
+        return <FeedbackProblemDetection filters={filters} />;
       case "team":
-        return <TeamAnalytics />;
+        return <TeamAnalytics filters={filters} />;
       case "usage":
-        return <UsagePatterns />;
+        return <UsagePatterns filters={filters} />;
       case "featureflags":
-        return <FeatureFlagRollout />;
+        return <FeatureFlagRollout filters={filters} />;
       case "cost":
-        return <CostCredits rbac={rbac} />;
+        return <CostCredits rbac={rbac} filters={filters} />;
       case "admin":
         // Preview bypass: allow access regardless of role
         if (PREVIEW_MODE_SHOW_ADMIN) {
-          return <KaviaAdminOnly rbac={rbac} previewBypass />;
+          return <KaviaAdminOnly rbac={rbac} previewBypass filters={filters} />;
         }
         // Fallback to original mock gating (shouldn't be hit in preview)
         if (!canAccess(rbac, ["KAVIA_ADMIN"])) {
           return <p className="text-sm text-red-600 dark:text-red-400">Admin access required.</p>;
         }
-        return <KaviaAdminOnly rbac={rbac} />;
+        return <KaviaAdminOnly rbac={rbac} filters={filters} />;
       default:
         return null;
     }

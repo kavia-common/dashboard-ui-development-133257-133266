@@ -14,6 +14,7 @@ export default function GlobalToolbar({
   exportTargetRef,
 }) {
   const handle = (key, val) => onChange && onChange({ ...filters, [key]: val });
+  const updateSort = (by, dir) => onChange && onChange({ ...filters, sort: { by, dir } });
 
   return (
     <div className="w-full bg-white/80 dark:bg-slate-900/70 backdrop-blur border-b border-slate-200 dark:border-slate-800">
@@ -112,11 +113,65 @@ export default function GlobalToolbar({
 
           {/* Actions cluster */}
           <div className="flex items-center justify-end gap-2">
+            {/* Sorting controls vary by metric group; provide common fields */}
+            <div className="flex items-center gap-2">
+              <label className="text-xs text-slate-500 dark:text-slate-400">Sort by</label>
+              <select
+                className="px-2 py-1 text-sm rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200"
+                value={filters.sort?.by || ""}
+                onChange={(e) => updateSort(e.target.value, filters.sort?.dir || "desc")}
+                aria-label="Sort by"
+                title="Choose a field to sort the active tables"
+              >
+                <option value="">Auto</option>
+                {filters.metricGroup === "adoption" && (
+                  <>
+                    <option value="count">Usage Count</option>
+                    <option value="growth">Growth</option>
+                    <option value="dau">DAU</option>
+                    <option value="wau">WAU</option>
+                    <option value="mau">MAU</option>
+                  </>
+                )}
+                {filters.metricGroup === "effectiveness" && (
+                  <>
+                    <option value="rate">Acceptance Rate</option>
+                    <option value="value">Outcome Count</option>
+                  </>
+                )}
+                {filters.metricGroup === "training" && (
+                  <>
+                    <option value="percent">Adoption %</option>
+                    <option value="tickets">Tickets</option>
+                  </>
+                )}
+                {filters.metricGroup === "cost" && (
+                  <>
+                    <option value="used">Credits Used</option>
+                    <option value="cost">Cost</option>
+                    <option value="balance">Balance</option>
+                  </>
+                )}
+              </select>
+              <select
+                className="px-2 py-1 text-sm rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200"
+                value={filters.sort?.dir || "desc"}
+                onChange={(e) => updateSort(filters.sort?.by || "", e.target.value)}
+                aria-label="Sort direction"
+                title="Choose sorting direction"
+              >
+                <option value="desc">Desc</option>
+                <option value="asc">Asc</option>
+              </select>
+            </div>
             <input
               className="px-3 py-1.5 text-sm rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200"
               placeholder="Search"
               aria-label="Search"
-              onChange={(e) => onSearch && onSearch(e.target.value)}
+              value={filters.search || ""}
+              onChange={(e) => {
+                onSearch && onSearch(e.target.value);
+              }}
             />
             <button
               type="button"

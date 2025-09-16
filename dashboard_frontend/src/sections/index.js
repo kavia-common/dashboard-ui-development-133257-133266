@@ -44,7 +44,7 @@ function RoleBadge({ minRoles }) {
 }
 
 // PUBLIC_INTERFACE
-export function AdoptionEngagement({ rbac }) {
+export function AdoptionEngagement({ rbac, filters }) {
   const minRoles = ["TENANT_ADMIN", "KAVIA_ADMIN"];
   const allowed = canAccess(rbac, minRoles);
   return (
@@ -68,46 +68,85 @@ export function AdoptionEngagement({ rbac }) {
 
       <Card title="Module Usage" subtitle="Interactions by module" roleBadge={<RoleBadge minRoles={minRoles} />}>
         <div className="grid grid-cols-1 gap-4">
-          <BarChartLike data={mockModuleUsage} xKey="module" yKey="count" color="#3b82f6" />
-          <div aria-label="Module usage table" role="region" className="mt-2">
-            <SimpleTable
-              columns={[
-                { key: "module", header: "Module" },
-                { key: "count", header: "Usage Count" },
-              ]}
-              rows={mockModuleUsage}
-            />
-          </div>
+          {(() => {
+            const { applyFilters } = require("../utils/dataFilters");
+            const filtered = applyFilters({
+              rows: mockModuleUsage,
+              filters,
+              searchableKeys: ["module", "count"],
+              sortNumericFallbackKey: "count",
+            });
+            return (
+              <>
+                <BarChartLike data={filtered} xKey="module" yKey="count" color="#3b82f6" />
+                <div aria-label="Module usage table" role="region" className="mt-2">
+                  <SimpleTable
+                    columns={[
+                      { key: "module", header: "Module" },
+                      { key: "count", header: "Usage Count" },
+                    ]}
+                    rows={filtered}
+                  />
+                </div>
+              </>
+            );
+          })()}
         </div>
       </Card>
 
       <Card title="Department Growth Trend" subtitle="Monthly %" roleBadge={<RoleBadge minRoles={minRoles} />}>
         <div className="grid grid-cols-1 gap-4">
-          <BarChartLike data={mockDepartments} xKey="dept" yKey="growth" color="#8b5cf6" />
-          <div aria-label="Department growth table" role="region" className="mt-2">
-            <SimpleTable
-              columns={[
-                { key: "dept", header: "Department" },
-                { key: "growth", header: "Growth (%)", render: (v) => `${v}%` },
-              ]}
-              rows={mockDepartments}
-            />
-          </div>
+          {(() => {
+            const { applyFilters } = require("../utils/dataFilters");
+            const filtered = applyFilters({
+              rows: mockDepartments,
+              filters,
+              searchableKeys: ["dept", "growth"],
+              sortNumericFallbackKey: "growth",
+            });
+            return (
+              <>
+                <BarChartLike data={filtered} xKey="dept" yKey="growth" color="#8b5cf6" />
+                <div aria-label="Department growth table" role="region" className="mt-2">
+                  <SimpleTable
+                    columns={[
+                      { key: "dept", header: "Department" },
+                      { key: "growth", header: "Growth (%)", render: (v) => `${v}%` },
+                    ]}
+                    rows={filtered}
+                  />
+                </div>
+              </>
+            );
+          })()}
         </div>
       </Card>
 
       <Card title="Discovery Funnel" subtitle="From discovered to retained" roleBadge={<RoleBadge minRoles={minRoles} />}>
         <div className="grid grid-cols-1 gap-4">
-          <BarChartLike data={mockDiscoveryFunnel} xKey="stage" yKey="value" color="#f59e0b" />
-          <div aria-label="Discovery funnel table" role="region" className="mt-2">
-            <SimpleTable
-              columns={[
-                { key: "stage", header: "Stage" },
-                { key: "value", header: "Users" },
-              ]}
-              rows={mockDiscoveryFunnel}
-            />
-          </div>
+          {(() => {
+            const { applyFilters } = require("../utils/dataFilters");
+            const filtered = applyFilters({
+              rows: mockDiscoveryFunnel,
+              filters,
+              searchableKeys: ["stage", "value"],
+              sortNumericFallbackKey: "value",
+            });
+            return (
+              <>
+                <BarChartLike data={filtered} xKey="stage" yKey="value" color="#f59e0b" />
+                <div aria-label="Discovery funnel table" role="region" className="mt-2">
+                  <SimpleTable
+                    columns={[
+                      { key: "stage", header: "Stage" },
+                      { key: "value", header: "Users" },
+                    ]}
+                    rows={filtered}
+                  />
+                </div>
+              </>
+            );
+          })()}
         </div>
       </Card>
 
@@ -132,15 +171,26 @@ export function AdoptionEngagement({ rbac }) {
 
       <Card title="Active Usage Snapshot" subtitle="Monthly rolling user activity" roleBadge={<RoleBadge minRoles={minRoles} />}>
         <div aria-label="DAU WAU MAU table" role="region">
-          <SimpleTable
-            columns={[
-              { key: "label", header: "Period" },
-              { key: "dau", header: "DAU" },
-              { key: "wau", header: "WAU" },
-              { key: "mau", header: "MAU" },
-            ]}
-            rows={mockTimeSeries}
-          />
+          {(() => {
+            const { applyFilters } = require("../utils/dataFilters");
+            const filtered = applyFilters({
+              rows: mockTimeSeries,
+              filters,
+              searchableKeys: ["label", "dau", "wau", "mau"],
+              sortNumericFallbackKey: filters?.sort?.by && ["dau","wau","mau"].includes(filters.sort.by) ? filters.sort.by : "",
+            });
+            return (
+              <SimpleTable
+                columns={[
+                  { key: "label", header: "Period" },
+                  { key: "dau", header: "DAU" },
+                  { key: "wau", header: "WAU" },
+                  { key: "mau", header: "MAU" },
+                ]}
+                rows={filtered}
+              />
+            );
+          })()}
         </div>
       </Card>
 
@@ -150,37 +200,63 @@ export function AdoptionEngagement({ rbac }) {
 }
 
 // PUBLIC_INTERFACE
-export function Effectiveness({ rbac }) {
+export function Effectiveness({ rbac, filters }) {
   const minRoles = ["TENANT_ADMIN", "KAVIA_ADMIN"];
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <Card title="AI Outcomes" subtitle="Accepted vs Edited vs Discarded" roleBadge={<RoleBadge minRoles={minRoles} />}>
         <div className="grid grid-cols-1 gap-4">
-          <PieChartLike parts={withColors(mockEffectiveness.outcomes, palette)} />
-          <div aria-label="AI outcomes table" role="region">
-            <SimpleTable
-              columns={[
-                { key: "label", header: "Outcome" },
-                { key: "value", header: "Count" },
-              ]}
-              rows={mockEffectiveness.outcomes}
-            />
-          </div>
+          {(() => {
+            const { applyFilters } = require("../utils/dataFilters");
+            const filtered = applyFilters({
+              rows: mockEffectiveness.outcomes,
+              filters,
+              searchableKeys: ["label", "value"],
+              sortNumericFallbackKey: "value",
+            });
+            return (
+              <>
+                <PieChartLike parts={withColors(filtered, palette)} />
+                <div aria-label="AI outcomes table" role="region">
+                  <SimpleTable
+                    columns={[
+                      { key: "label", header: "Outcome" },
+                      { key: "value", header: "Count" },
+                    ]}
+                    rows={filtered}
+                  />
+                </div>
+              </>
+            );
+          })()}
         </div>
       </Card>
 
       <Card title="Acceptance Rate Trend" subtitle="Weekly" roleBadge={<RoleBadge minRoles={minRoles} />}>
         <div className="grid grid-cols-1 gap-4">
-          <LineChartLike data={mockEffectiveness.acceptanceTrend} xKey="label" yKey="rate" color="#10b981" />
-          <div aria-label="Acceptance rate table" role="region">
-            <SimpleTable
-              columns={[
-                { key: "label", header: "Week" },
-                { key: "rate", header: "Acceptance Rate", render: (v) => `${v}%` },
-              ]}
-              rows={mockEffectiveness.acceptanceTrend}
-            />
-          </div>
+          {(() => {
+            const { applyFilters } = require("../utils/dataFilters");
+            const filtered = applyFilters({
+              rows: mockEffectiveness.acceptanceTrend,
+              filters,
+              searchableKeys: ["label", "rate"],
+              sortNumericFallbackKey: "rate",
+            });
+            return (
+              <>
+                <LineChartLike data={filtered} xKey="label" yKey="rate" color="#10b981" />
+                <div aria-label="Acceptance rate table" role="region">
+                  <SimpleTable
+                    columns={[
+                      { key: "label", header: "Week" },
+                      { key: "rate", header: "Acceptance Rate", render: (v) => `${v}%` },
+                    ]}
+                    rows={filtered}
+                  />
+                </div>
+              </>
+            );
+          })()}
         </div>
       </Card>
 
@@ -203,35 +279,58 @@ export function Effectiveness({ rbac }) {
       </Card>
 
       <Card title="Before vs After (Workflow Time)" subtitle="Minutes saved" roleBadge={<RoleBadge minRoles={minRoles} />}>
-        <SimpleTable
-          columns={[
-            { key: "workflow", header: "Workflow" },
-            { key: "beforeMin", header: "Before (min)" },
-            { key: "afterMin", header: "After (min)" },
-            { key: "saved", header: "Saved (min)", render: (_v, row) => row.beforeMin - row.afterMin },
-          ]}
-          rows={mockBeforeAfter.map((r) => ({ ...r, saved: r.beforeMin - r.afterMin }))}
-        />
+        {(() => {
+          const { applyFilters } = require("../utils/dataFilters");
+          const rows = mockBeforeAfter.map((r) => ({ ...r, saved: r.beforeMin - r.afterMin }));
+          const filtered = applyFilters({
+            rows,
+            filters,
+            searchableKeys: ["workflow", "beforeMin", "afterMin", "saved"],
+            sortNumericFallbackKey: "saved",
+          });
+          return (
+            <SimpleTable
+              columns={[
+                { key: "workflow", header: "Workflow" },
+                { key: "beforeMin", header: "Before (min)" },
+                { key: "afterMin", header: "After (min)" },
+                { key: "saved", header: "Saved (min)" },
+              ]}
+              rows={filtered}
+            />
+          );
+        })()}
       </Card>
 
       <DrilldownCard title="Workflow Funnels by Team" subtitle="Start -> Stage1 -> Stage2 -> Done" roleBadge={<RoleBadge minRoles={minRoles} />}>
-        <SimpleTable
-          columns={[
-            { key: "team", header: "Team" },
-            { key: "start", header: "Start" },
-            { key: "stage1", header: "Stage 1" },
-            { key: "stage2", header: "Stage 2" },
-            { key: "done", header: "Done" },
-          ]}
-          rows={mockWorkflowFunnels}
-        />
+        {(() => {
+          const { applyFilters } = require("../utils/dataFilters");
+          const filtered = applyFilters({
+            rows: mockWorkflowFunnels,
+            filters,
+            searchableKeys: ["team", "start", "stage1", "stage2", "done"],
+            sortNumericFallbackKey: "done",
+          });
+          return (
+            <SimpleTable
+              columns={[
+                { key: "team", header: "Team" },
+                { key: "start", header: "Start" },
+                { key: "stage1", header: "Stage 1" },
+                { key: "stage2", header: "Stage 2" },
+                { key: "done", header: "Done" },
+              ]}
+              rows={filtered}
+            />
+          );
+        })()}
       </DrilldownCard>
     </div>
   );
 }
 
 // PUBLIC_INTERFACE
-export function TrainingAwareness() {
+export function TrainingAwareness({ filters }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <Card title="Feature Adoption %" subtitle="Top features">
@@ -249,40 +348,75 @@ export function TrainingAwareness() {
           ))}
         </div>
         <div aria-label="Training adoption table" role="region" className="mt-4">
-          <SimpleTable
-            columns={[
-              { key: "feature", header: "Feature" },
-              { key: "percent", header: "Adoption", render: (v) => `${v}%` },
-            ]}
-            rows={mockTrainingFeatureAdoption}
-          />
+          {(() => {
+            const { applyFilters } = require("../utils/dataFilters");
+            const filtered = applyFilters({
+              rows: mockTrainingFeatureAdoption,
+              filters,
+              searchableKeys: ["feature", "percent"],
+              sortNumericFallbackKey: "percent",
+            });
+            return (
+              <SimpleTable
+                columns={[
+                  { key: "feature", header: "Feature" },
+                  { key: "percent", header: "Adoption", render: (v) => `${v}%` },
+                ]}
+                rows={filtered}
+              />
+            );
+          })()}
         </div>
       </Card>
       <Card title="Support Trends" subtitle="Tickets per week">
         <div className="grid grid-cols-1 gap-4">
-          <BarChartLike data={mockSupportTrend} xKey="label" yKey="tickets" color="#ef4444" />
-          <div aria-label="Support tickets table" role="region">
-            <SimpleTable
-              columns={[
-                { key: "label", header: "Week" },
-                { key: "tickets", header: "Tickets" },
-              ]}
-              rows={mockSupportTrend}
-            />
-          </div>
+          {(() => {
+            const { applyFilters } = require("../utils/dataFilters");
+            const filtered = applyFilters({
+              rows: mockSupportTrend,
+              filters,
+              searchableKeys: ["label", "tickets"],
+              sortNumericFallbackKey: "tickets",
+            });
+            return (
+              <>
+                <BarChartLike data={filtered} xKey="label" yKey="tickets" color="#ef4444" />
+                <div aria-label="Support tickets table" role="region">
+                  <SimpleTable
+                    columns={[
+                      { key: "label", header: "Week" },
+                      { key: "tickets", header: "Tickets" },
+                    ]}
+                    rows={filtered}
+                  />
+                </div>
+              </>
+            );
+          })()}
         </div>
       </Card>
 
       <Card title="Onboarding Progress" subtitle="Milestones">
-        <SimpleTable
-          columns={[
-            { key: "user", header: "User" },
-            { key: "team", header: "Team" },
-            { key: "milestone", header: "Current Milestone" },
-            { key: "progress", header: "Progress", render: (v) => `${v}%` },
-          ]}
-          rows={mockOnboarding}
-        />
+        {(() => {
+          const { applyFilters } = require("../utils/dataFilters");
+          const filtered = applyFilters({
+            rows: mockOnboarding,
+            filters,
+            searchableKeys: ["user", "team", "milestone", "progress"],
+            sortNumericFallbackKey: "progress",
+          });
+          return (
+            <SimpleTable
+              columns={[
+                { key: "user", header: "User" },
+                { key: "team", header: "Team" },
+                { key: "milestone", header: "Current Milestone" },
+                { key: "progress", header: "Progress", render: (v) => `${v}%` },
+              ]}
+              rows={filtered}
+            />
+          );
+        })()}
         <div className="space-y-2 mt-3">
           {mockOnboarding.map((o) => (
             <div key={o.user}>
@@ -296,16 +430,27 @@ export function TrainingAwareness() {
       </Card>
 
       <Card title="Cohort Retention" subtitle="D0/D7/D14/D30">
-        <SimpleTable
-          columns={[
-            { key: "cohort", header: "Cohort" },
-            { key: "d0", header: "D0 (%)" },
-            { key: "d7", header: "D7 (%)" },
-            { key: "d14", header: "D14 (%)" },
-            { key: "d30", header: "D30 (%)" },
-          ]}
-          rows={mockCohorts}
-        />
+        {(() => {
+          const { applyFilters } = require("../utils/dataFilters");
+          const filtered = applyFilters({
+            rows: mockCohorts,
+            filters,
+            searchableKeys: ["cohort", "d0", "d7", "d14", "d30"],
+            sortNumericFallbackKey: "d7",
+          });
+          return (
+            <SimpleTable
+              columns={[
+                { key: "cohort", header: "Cohort" },
+                { key: "d0", header: "D0 (%)" },
+                { key: "d7", header: "D7 (%)" },
+                { key: "d14", header: "D14 (%)" },
+                { key: "d30", header: "D30 (%)" },
+              ]}
+              rows={filtered}
+            />
+          );
+        })()}
         <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
           <div><div className="text-xs mb-1">D7</div><LineChartLike data={mockCohorts.map(c => ({ label: c.cohort, val: c.d7 }))} xKey="label" yKey="val" color="#3b82f6" /></div>
           <div><div className="text-xs mb-1">D14</div><LineChartLike data={mockCohorts.map(c => ({ label: c.cohort, val: c.d14 }))} xKey="label" yKey="val" color="#10b981" /></div>
@@ -317,7 +462,7 @@ export function TrainingAwareness() {
 }
 
 // PUBLIC_INTERFACE
-export function OrganizationalMetrics() {
+export function OrganizationalMetrics({ filters }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <Card title="License Utilization" subtitle={`${mockLicenseUtilization.used}/${mockLicenseUtilization.total}`}>
@@ -369,92 +514,163 @@ export function OrganizationalMetrics() {
 }
 
 // PUBLIC_INTERFACE
-export function FeedbackProblemDetection() {
+export function FeedbackProblemDetection({ filters }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <Card title="Workflow Drop-off Funnel" subtitle="Stages">
         <div className="grid grid-cols-1 gap-4">
-          <BarChartLike data={mockFeedbackFunnel} xKey="stage" yKey="value" color="#f59e0b" />
-          <div aria-label="Workflow funnel table" role="region">
-            <SimpleTable
-              columns={[
-                { key: "stage", header: "Stage" },
-                { key: "value", header: "Users" },
-              ]}
-              rows={mockFeedbackFunnel}
-            />
-          </div>
+          {(() => {
+            const { applyFilters } = require("../utils/dataFilters");
+            const filtered = applyFilters({
+              rows: mockFeedbackFunnel,
+              filters,
+              searchableKeys: ["stage", "value"],
+              sortNumericFallbackKey: "value",
+            });
+            return (
+              <>
+                <BarChartLike data={filtered} xKey="stage" yKey="value" color="#f59e0b" />
+                <div aria-label="Workflow funnel table" role="region">
+                  <SimpleTable
+                    columns={[
+                      { key: "stage", header: "Stage" },
+                      { key: "value", header: "Users" },
+                    ]}
+                    rows={filtered}
+                  />
+                </div>
+              </>
+            );
+          })()}
         </div>
       </Card>
       <Card title="Support Metrics" subtitle="Trends and categories">
         <div className="grid grid-cols-1 gap-4">
-          <LineChartLike data={mockSupportTrend} xKey="label" yKey="tickets" color="#ef4444" />
-          <div aria-label="Support metrics table" role="region">
-            <SimpleTable
-              columns={[
-                { key: "label", header: "Week" },
-                { key: "tickets", header: "Tickets" },
-                { key: "sla", header: "SLA Met", render: (_v, row) => (row.tickets % 2 === 0 ? "Yes" : "No") },
-              ]}
-              rows={mockSupportTrend.map((r) => ({ ...r, sla: r.tickets % 2 === 0 }))}
-            />
-          </div>
+          {(() => {
+            const { applyFilters } = require("../utils/dataFilters");
+            const rows = mockSupportTrend.map((r) => ({ ...r, sla: r.tickets % 2 === 0 }));
+            const filtered = applyFilters({
+              rows,
+              filters,
+              searchableKeys: ["label", "tickets"],
+              sortNumericFallbackKey: "tickets",
+            });
+            return (
+              <>
+                <LineChartLike data={filtered} xKey="label" yKey="tickets" color="#ef4444" />
+                <div aria-label="Support metrics table" role="region">
+                  <SimpleTable
+                    columns={[
+                      { key: "label", header: "Week" },
+                      { key: "tickets", header: "Tickets" },
+                      { key: "sla", header: "SLA Met", render: (v) => (v ? "Yes" : "No") },
+                    ]}
+                    rows={filtered}
+                  />
+                </div>
+              </>
+            );
+          })()}
         </div>
       </Card>
 
       <Card title="Feedback Sentiment & Categories" subtitle="Recent tickets">
-        <SimpleTable
-          columns={[
-            { key: "id", header: "Ticket" },
-            { key: "team", header: "Team" },
-            { key: "category", header: "Category" },
-            { key: "sentiment", header: "Sentiment" },
-            { key: "score", header: "Score", render: (v) => v.toFixed(2) },
-          ]}
-          rows={mockFeedbackSentiment}
-        />
+        {(() => {
+          const { applyFilters } = require("../utils/dataFilters");
+          const filtered = applyFilters({
+            rows: mockFeedbackSentiment,
+            filters,
+            searchableKeys: ["id", "team", "category", "sentiment", "score"],
+            sortNumericFallbackKey: "score",
+          });
+          return (
+            <SimpleTable
+              columns={[
+                { key: "id", header: "Ticket" },
+                { key: "team", header: "Team" },
+                { key: "category", header: "Category" },
+                { key: "sentiment", header: "Sentiment" },
+                { key: "score", header: "Score", render: (v) => Number(v).toFixed(2) },
+              ]}
+              rows={filtered}
+            />
+          );
+        })()}
       </Card>
 
       <Card title="Resolution Times" subtitle="Median and p90 (hours)">
-        <SimpleTable
-          columns={[
-            { key: "category", header: "Category" },
-            { key: "medianH", header: "Median (h)" },
-            { key: "p90H", header: "p90 (h)" },
-          ]}
-          rows={mockResolutionTimes}
-        />
+        {(() => {
+          const { applyFilters } = require("../utils/dataFilters");
+          const filtered = applyFilters({
+            rows: mockResolutionTimes,
+            filters,
+            searchableKeys: ["category", "medianH", "p90H"],
+            sortNumericFallbackKey: "medianH",
+          });
+          return (
+            <SimpleTable
+              columns={[
+                { key: "category", header: "Category" },
+                { key: "medianH", header: "Median (h)" },
+                { key: "p90H", header: "p90 (h)" },
+              ]}
+              rows={filtered}
+            />
+          );
+        })()}
       </Card>
 
       <DrilldownCard title="Error Logs" subtitle="Last 10">
-        <SimpleTable
-          columns={[
-            { key: "ts", header: "Timestamp" },
-            { key: "level", header: "Level" },
-            { key: "component", header: "Component" },
-            { key: "message", header: "Message" },
-          ]}
-          rows={mockErrorLogs}
-        />
+        {(() => {
+          const { applyFilters } = require("../utils/dataFilters");
+          const filtered = applyFilters({
+            rows: mockErrorLogs,
+            filters,
+            searchableKeys: ["ts", "level", "component", "message"],
+            sortNumericFallbackKey: "",
+          });
+          return (
+            <SimpleTable
+              columns={[
+                { key: "ts", header: "Timestamp" },
+                { key: "level", header: "Level" },
+                { key: "component", header: "Component" },
+                { key: "message", header: "Message" },
+              ]}
+              rows={filtered}
+            />
+          );
+        })()}
       </DrilldownCard>
 
       <DrilldownCard title="Audit Trail" subtitle="Key user actions">
-        <SimpleTable
-          columns={[
-            { key: "ts", header: "Timestamp" },
-            { key: "user", header: "User" },
-            { key: "action", header: "Action" },
-            { key: "detail", header: "Detail" },
-          ]}
-          rows={mockAudit}
-        />
+        {(() => {
+          const { applyFilters } = require("../utils/dataFilters");
+          const filtered = applyFilters({
+            rows: mockAudit,
+            filters,
+            searchableKeys: ["ts", "user", "action", "detail"],
+            sortNumericFallbackKey: "",
+          });
+          return (
+            <SimpleTable
+              columns={[
+                { key: "ts", header: "Timestamp" },
+                { key: "user", header: "User" },
+                { key: "action", header: "Action" },
+                { key: "detail", header: "Detail" },
+              ]}
+              rows={filtered}
+            />
+          );
+        })()}
       </DrilldownCard>
     </div>
   );
 }
 
 // PUBLIC_INTERFACE
-export function TeamAnalytics() {
+export function TeamAnalytics({ filters }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <Card title="Team Adoption Score" subtitle="Ranked">
@@ -472,14 +688,25 @@ export function TeamAnalytics() {
           ))}
         </div>
         <div aria-label="Team adoption table" role="region" className="mt-4">
-          <SimpleTable
-            columns={[
-              { key: "team", header: "Team" },
-              { key: "score", header: "Engagement Score" },
-            ]}
-            rows={mockTeamAdoption}
-            onRowClick={(row) => alert(`Drill-down: ${row.team} engagement details`)}
-          />
+          {(() => {
+            const { applyFilters } = require("../utils/dataFilters");
+            const filtered = applyFilters({
+              rows: mockTeamAdoption,
+              filters,
+              searchableKeys: ["team", "score"],
+              sortNumericFallbackKey: "score",
+            });
+            return (
+              <SimpleTable
+                columns={[
+                  { key: "team", header: "Team" },
+                  { key: "score", header: "Engagement Score" },
+                ]}
+                rows={filtered}
+                onRowClick={(row) => alert(`Drill-down: ${row.team} engagement details`)}
+              />
+            );
+          })()}
         </div>
       </Card>
       <DrilldownCard title="Feature-Team Heatmap" subtitle="Intensity of usage (assumed demo data)">
@@ -491,20 +718,36 @@ export function TeamAnalytics() {
           valueToColor={(v) => `hsl(${(220 - v) * 2} 80% ${Math.max(28, 92 - v)}%)`}
         />
         <div aria-label="Team feature usage table" role="region" className="mt-4">
-          <SimpleTable
-            columns={[
-              { key: "team", header: "Team" },
-              { key: "topFeature", header: "Top Feature" },
-              { key: "usage", header: "Usage Count" },
-            ]}
-            rows={[
-              // Assumption: Derive top feature rough counts from heatmap first column for illustrative purposes
-              { team: mockTeamFeatureHeatmap.teams[0], topFeature: "Build", usage: 340 },
-              { team: mockTeamFeatureHeatmap.teams[1], topFeature: "Inspect", usage: 280 },
-              { team: mockTeamFeatureHeatmap.teams[2], topFeature: "Plan", usage: 240 },
-              { team: mockTeamFeatureHeatmap.teams[3], topFeature: "Inspect", usage: 190 },
-            ]}
-          />
+          {(() => {
+            const { applyFilters } = require("../utils/dataFilters");
+            // Derive a table from heatmap: team, topFeature, usage (max across features)
+            const rows = mockTeamFeatureHeatmap.teams.map((t, ti) => {
+              const vals = mockTeamFeatureHeatmap.values[ti];
+              let maxIdx = 0;
+              vals.forEach((v, idx) => { if (v > vals[maxIdx]) maxIdx = idx; });
+              return {
+                team: t,
+                topFeature: mockTeamFeatureHeatmap.features[maxIdx],
+                usage: vals[maxIdx],
+              };
+            });
+            const filtered = applyFilters({
+              rows,
+              filters,
+              searchableKeys: ["team", "topFeature", "usage"],
+              sortNumericFallbackKey: "usage",
+            });
+            return (
+              <SimpleTable
+                columns={[
+                  { key: "team", header: "Team" },
+                  { key: "topFeature", header: "Top Feature" },
+                  { key: "usage", header: "Usage Count" },
+                ]}
+                rows={filtered}
+              />
+            );
+          })()}
         </div>
       </DrilldownCard>
     </div>
@@ -512,35 +755,62 @@ export function TeamAnalytics() {
 }
 
 // PUBLIC_INTERFACE
-export function UsagePatterns() {
+export function UsagePatterns({ filters }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <Card title="Usage by Hour" subtitle="UTC">
         <div className="grid grid-cols-1 gap-4">
-          <BarChartLike data={mockUsageByTime.map(d => ({ label: d.hour, count: d.count }))} xKey="label" yKey="count" color="#3b82f6" />
-          <div aria-label="Hourly usage table" role="region">
-            <SimpleTable
-              columns={[
-                { key: "hour", header: "Hour (UTC)" },
-                { key: "count", header: "Sessions" },
-              ]}
-              rows={mockUsageByTime}
-            />
-          </div>
+          {(() => {
+            const { applyFilters } = require("../utils/dataFilters");
+            const mapped = mockUsageByTime.map(d => ({ label: d.hour, count: d.count, hour: d.hour }));
+            const filtered = applyFilters({
+              rows: mapped,
+              filters,
+              searchableKeys: ["label", "count", "hour"],
+              sortNumericFallbackKey: "count",
+            });
+            return (
+              <>
+                <BarChartLike data={filtered.map(({ label, count }) => ({ label, count }))} xKey="label" yKey="count" color="#3b82f6" />
+                <div aria-label="Hourly usage table" role="region">
+                  <SimpleTable
+                    columns={[
+                      { key: "hour", header: "Hour (UTC)" },
+                      { key: "count", header: "Sessions" },
+                    ]}
+                    rows={filtered.map(({ hour, count }) => ({ hour, count }))}
+                  />
+                </div>
+              </>
+            );
+          })()}
         </div>
       </Card>
       <Card title="Geographic Usage" subtitle="Regions">
         <div className="grid grid-cols-1 gap-4">
-          <BarChartLike data={mockGeoUsage.map(d => ({ label: d.region, count: d.count }))} xKey="label" yKey="count" color="#8b5cf6" />
-          <div aria-label="Geographic usage table" role="region">
-            <SimpleTable
-              columns={[
-                { key: "region", header: "Region" },
-                { key: "count", header: "Sessions" },
-              ]}
-              rows={mockGeoUsage}
-            />
-          </div>
+          {(() => {
+            const { applyFilters } = require("../utils/dataFilters");
+            const filtered = applyFilters({
+              rows: mockGeoUsage,
+              filters,
+              searchableKeys: ["region", "count"],
+              sortNumericFallbackKey: "count",
+            });
+            return (
+              <>
+                <BarChartLike data={filtered.map(d => ({ label: d.region, count: d.count }))} xKey="label" yKey="count" color="#8b5cf6" />
+                <div aria-label="Geographic usage table" role="region">
+                  <SimpleTable
+                    columns={[
+                      { key: "region", header: "Region" },
+                      { key: "count", header: "Sessions" },
+                    ]}
+                    rows={filtered}
+                  />
+                </div>
+              </>
+            );
+          })()}
         </div>
       </Card>
       <Card title="Geo Compliance" subtitle="Region compliance status">
@@ -551,8 +821,15 @@ export function UsagePatterns() {
           <div>
             <div className="text-xs text-slate-500 dark:text-slate-400 mb-1">Overall Compliance</div>
             {(() => {
-              const totalUsage = mockGeoCompliance.reduce((a, b) => a + b.usage, 0) || 1;
-              const compliantUsage = mockGeoCompliance.filter(r => r.compliant).reduce((a, b) => a + b.usage, 0);
+              const { applyFilters } = require("../utils/dataFilters");
+              const filtered = applyFilters({
+                rows: mockGeoCompliance,
+                filters,
+                searchableKeys: ["region", "usage"],
+                sortNumericFallbackKey: "usage",
+              });
+              const totalUsage = filtered.reduce((a, b) => a + b.usage, 0) || 1;
+              const compliantUsage = filtered.filter(r => r.compliant).reduce((a, b) => a + b.usage, 0);
               const nonCompliantUsage = totalUsage - compliantUsage;
               return (
                 <PieChartLike
@@ -568,28 +845,49 @@ export function UsagePatterns() {
           {/* Per-region compliance bars */}
           <div>
             <div className="text-xs text-slate-500 dark:text-slate-400 mb-1">By Region</div>
-            <BarChartLike
-              data={mockGeoCompliance.map(d => ({
-                label: d.region,
-                // Weight compliant regions slightly higher color intensity (visual hint)
-                count: d.usage
-              }))}
-              xKey="label"
-              yKey="count"
-              color="#3b82f6"
-            />
+            {(() => {
+              const { applyFilters } = require("../utils/dataFilters");
+              const filtered = applyFilters({
+                rows: mockGeoCompliance,
+                filters,
+                searchableKeys: ["region", "usage"],
+                sortNumericFallbackKey: "usage",
+              });
+              return (
+                <BarChartLike
+                  data={filtered.map(d => ({
+                    label: d.region,
+                    count: d.usage
+                  }))}
+                  xKey="label"
+                  yKey="count"
+                  color="#3b82f6"
+                />
+              );
+            })()}
           </div>
 
           {/* Tabular details */}
           <div aria-label="Geo compliance table" role="region">
-            <SimpleTable
-              columns={[
-                { key: "region", header: "Region" },
-                { key: "usage", header: "Usage" },
-                { key: "compliant", header: "Compliant", render: (v) => (v ? "✅" : "⚠️") },
-              ]}
-              rows={mockGeoCompliance}
-            />
+            {(() => {
+              const { applyFilters } = require("../utils/dataFilters");
+              const filtered = applyFilters({
+                rows: mockGeoCompliance,
+                filters,
+                searchableKeys: ["region", "usage"],
+                sortNumericFallbackKey: "usage",
+              });
+              return (
+                <SimpleTable
+                  columns={[
+                    { key: "region", header: "Region" },
+                    { key: "usage", header: "Usage" },
+                    { key: "compliant", header: "Compliant", render: (v) => (v ? "✅" : "⚠️") },
+                  ]}
+                  rows={filtered}
+                />
+              );
+            })()}
           </div>
         </div>
       </Card>
@@ -598,7 +896,7 @@ export function UsagePatterns() {
 }
 
 // PUBLIC_INTERFACE
-export function FeatureFlagRollout() {
+export function FeatureFlagRollout({ filters }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <Card title="Rollout Progress" subtitle={`${mockRollout.progress}%`}>
@@ -637,7 +935,7 @@ export function FeatureFlagRollout() {
 }
 
 // PUBLIC_INTERFACE
-export function CostCredits({ rbac }) {
+export function CostCredits({ rbac, filters }) {
   const minRoles = ["TENANT_ADMIN", "FINANCE", "KAVIA_ADMIN"];
   const allowed = canAccess(rbac, minRoles);
   return (
@@ -661,16 +959,27 @@ export function CostCredits({ rbac }) {
         </div>
       </Card>
       <Card title="Top Users by Credits" subtitle="Use for chargeback" roleBadge={<RoleBadge minRoles={minRoles} />}>
-        <SimpleTable
-          columns={[
-            { key: "user", header: "User" },
-            { key: "team", header: "Team" },
-            { key: "used", header: "Used" },
-            { key: "balance", header: "Balance" },
-            { key: "cost", header: "Cost ($)" },
-          ]}
-          rows={mockTopUsersCredits}
-        />
+        {(() => {
+          const { applyFilters } = require("../utils/dataFilters");
+          const filtered = applyFilters({
+            rows: mockTopUsersCredits,
+            filters,
+            searchableKeys: ["user", "team", "used", "balance", "cost"],
+            sortNumericFallbackKey: "used",
+          });
+          return (
+            <SimpleTable
+              columns={[
+                { key: "user", header: "User" },
+                { key: "team", header: "Team" },
+                { key: "used", header: "Used" },
+                { key: "balance", header: "Balance" },
+                { key: "cost", header: "Cost ($)" },
+              ]}
+              rows={filtered}
+            />
+          );
+        })()}
       </Card>
       <Card title="Cost-per-Usage Analytics" subtitle="Efficiency by feature">
         <SimpleTable
@@ -689,16 +998,28 @@ export function CostCredits({ rbac }) {
         />
       </Card>
       <DrilldownCard title="Allocations & Limits" subtitle="By team/entity" roleBadge={<RoleBadge minRoles={minRoles} />}>
-        <SimpleTable
-          columns={[
-            { key: "entity", header: "Entity" },
-            { key: "credits", header: "Credits Used" },
-            { key: "limit", header: "Limit" },
-            { key: "util", header: "Utilization", render: (_v, r) => `${Math.round((r.credits / r.limit) * 100)}%` },
-            { key: "cost", header: "Cost ($)" },
-          ]}
-          rows={mockCostAllocations.map((r) => ({ ...r, util: Math.round((r.credits / r.limit) * 100) }))}
-        />
+        {(() => {
+          const { applyFilters } = require("../utils/dataFilters");
+          const rows = mockCostAllocations.map((r) => ({ ...r, util: Math.round((r.credits / r.limit) * 100) }));
+          const filtered = applyFilters({
+            rows,
+            filters,
+            searchableKeys: ["entity", "credits", "limit", "util", "cost"],
+            sortNumericFallbackKey: "credits",
+          });
+          return (
+            <SimpleTable
+              columns={[
+                { key: "entity", header: "Entity" },
+                { key: "credits", header: "Credits Used" },
+                { key: "limit", header: "Limit" },
+                { key: "util", header: "Utilization", render: (v) => `${v}%` },
+                { key: "cost", header: "Cost ($)" },
+              ]}
+              rows={filtered}
+            />
+          );
+        })()}
       </DrilldownCard>
       {!allowed && <p className="text-sm text-red-600 dark:text-red-400">Access restricted for your role.</p>}
     </div>
@@ -706,7 +1027,7 @@ export function CostCredits({ rbac }) {
 }
 
 // PUBLIC_INTERFACE
-export function KaviaAdminOnly({ rbac, previewBypass = false }) {
+export function KaviaAdminOnly({ rbac, previewBypass = false, filters }) {
   const minRoles = ["KAVIA_ADMIN"];
   // In previewBypass, ignore mock RBAC and always render content.
   const allowed = previewBypass ? true : canAccess(rbac, minRoles);
@@ -728,15 +1049,27 @@ export function KaviaAdminOnly({ rbac, previewBypass = false }) {
       <Card title="ROI by Department" subtitle="Admin-only" roleBadge={<RoleBadge minRoles={minRoles} />}>
         <div className="grid grid-cols-1 gap-4">
           <BarChartLike data={mockAdminOnly.roiByDept.map(r => ({ dept: r.dept, roi: Math.round(r.roi * 100) }))} xKey="dept" yKey="roi" color="#10b981" />
-          <div aria-label="ROI table" role="region">
-            <SimpleTable
-              columns={[
-                { key: "dept", header: "Department" },
-                { key: "roi", header: "ROI (%)" },
-              ]}
-              rows={mockAdminOnly.roiByDept.map(r => ({ dept: r.dept, roi: `${Math.round(r.roi * 100)}%` }))}
-            />
-          </div>
+          {(() => {
+            const { applyFilters } = require("../utils/dataFilters");
+            const base = mockAdminOnly.roiByDept.map(r => ({ dept: r.dept, roi: Math.round(r.roi * 100) }));
+            const filtered = applyFilters({
+              rows: base,
+              filters,
+              searchableKeys: ["dept", "roi"],
+              sortNumericFallbackKey: "roi",
+            });
+            return (
+              <div aria-label="ROI table" role="region">
+                <SimpleTable
+                  columns={[
+                    { key: "dept", header: "Department" },
+                    { key: "roi", header: "ROI (%)" },
+                  ]}
+                  rows={filtered.map(r => ({ ...r, roi: `${r.roi}%` }))}
+                />
+              </div>
+            );
+          })()}
         </div>
       </Card>
       <Card title="Latency (p95)" subtitle="Monthly" roleBadge={<RoleBadge minRoles={minRoles} />}>
@@ -754,14 +1087,25 @@ export function KaviaAdminOnly({ rbac, previewBypass = false }) {
         </div>
       </Card>
       <Card title="Churn Risk" subtitle="Team risk score" roleBadge={<RoleBadge minRoles={minRoles} />}>
-        <SimpleTable
-          columns={[
-            { key: "team", header: "Team" },
-            { key: "risk", header: "Risk", render: (v) => `${Math.round(v * 100)}%` },
-            { key: "alert", header: "Alert", render: (_v, row) => (row.risk > 0.2 ? "⚠️ High" : "—") },
-          ]}
-          rows={mockAdminOnly.churnRisk}
-        />
+        {(() => {
+          const { applyFilters } = require("../utils/dataFilters");
+          const filtered = applyFilters({
+            rows: mockAdminOnly.churnRisk,
+            filters,
+            searchableKeys: ["team", "risk"],
+            sortNumericFallbackKey: "risk",
+          });
+          return (
+            <SimpleTable
+              columns={[
+                { key: "team", header: "Team" },
+                { key: "risk", header: "Risk", render: (v) => `${Math.round(v * 100)}%` },
+                { key: "alert", header: "Alert", render: (_v, row) => (row.risk > 0.2 ? "⚠️ High" : "—") },
+              ]}
+              rows={filtered}
+            />
+          );
+        })()}
       </Card>
 
       <Card title="Benchmarking" subtitle="Comparisons vs peer averages" roleBadge={<RoleBadge minRoles={minRoles} />}>
