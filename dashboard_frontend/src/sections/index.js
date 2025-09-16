@@ -39,6 +39,20 @@ const withColors = (arr, palette) =>
   arr.map((a, i) => ({ ...a, color: palette[i % palette.length] }));
 const palette = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"];
 
+/**
+ * Return a readable subtitle for charts/tables based on the active time preset.
+ * Defaults to "Monthly" to match initial mocks if not set.
+ */
+function timeSubtitle(filters, fallback = "Monthly") {
+  const p = (filters?.time?.preset || "").toLowerCase();
+  if (p === "daily") return "Daily";
+  if (p === "weekly") return "Weekly";
+  if (p === "monthly") return "Monthly";
+  if (p === "realtime") return "Real-time";
+  if (p === "custom") return "Custom";
+  return fallback;
+}
+
 function RoleBadge({ minRoles }) {
   return <span className="text-[10px] rounded px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">Min role: {minRoles.join(", ")}</span>;
 }
@@ -49,7 +63,7 @@ export function AdoptionEngagement({ rbac, filters }) {
   const allowed = canAccess(rbac, minRoles);
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <Card title={<span>DAU / WAU / MAU <InfoTooltip term="DAU/WAU/MAU" definition="Daily/Weekly/Monthly Active Users based on unique sessions." /></span>} subtitle="Monthly trend" roleBadge={<RoleBadge minRoles={minRoles} />}>
+      <Card title={<span>DAU / WAU / MAU <InfoTooltip term="DAU/WAU/MAU" definition="Daily/Weekly/Monthly Active Users based on unique sessions." /></span>} subtitle={`${timeSubtitle(filters)} trend`} roleBadge={<RoleBadge minRoles={minRoles} />}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <div className="text-xs mb-2">DAU</div>
@@ -94,7 +108,7 @@ export function AdoptionEngagement({ rbac, filters }) {
         </div>
       </Card>
 
-      <Card title="Module Usage" subtitle="Interactions by module" roleBadge={<RoleBadge minRoles={minRoles} />}>
+      <Card title="Module Usage" subtitle={`${timeSubtitle(filters)} · Interactions by module`} roleBadge={<RoleBadge minRoles={minRoles} />}>
         <div className="grid grid-cols-1 gap-4">
           {(() => {
             const { applyFilters } = require("../utils/dataFilters");
@@ -122,7 +136,7 @@ export function AdoptionEngagement({ rbac, filters }) {
         </div>
       </Card>
 
-      <Card title="Department Growth Trend" subtitle="Monthly %" roleBadge={<RoleBadge minRoles={minRoles} />}>
+      <Card title="Department Growth Trend" subtitle={`${timeSubtitle(filters)} %`} roleBadge={<RoleBadge minRoles={minRoles} />}>
         <div className="grid grid-cols-1 gap-4">
           {(() => {
             const { applyFilters } = require("../utils/dataFilters");
@@ -150,7 +164,7 @@ export function AdoptionEngagement({ rbac, filters }) {
         </div>
       </Card>
 
-      <Card title="Discovery Funnel" subtitle="From discovered to retained" roleBadge={<RoleBadge minRoles={minRoles} />}>
+      <Card title="Discovery Funnel" subtitle={`${timeSubtitle(filters)} · From discovered to retained`} roleBadge={<RoleBadge minRoles={minRoles} />}>
         <div className="grid grid-cols-1 gap-4">
           {(() => {
             const { applyFilters } = require("../utils/dataFilters");
@@ -197,7 +211,7 @@ export function AdoptionEngagement({ rbac, filters }) {
         />
       </Card>
 
-      <Card title="Active Usage Snapshot" subtitle="Monthly rolling user activity" roleBadge={<RoleBadge minRoles={minRoles} />}>
+      <Card title="Active Usage Snapshot" subtitle={`${timeSubtitle(filters)} rolling user activity`} roleBadge={<RoleBadge minRoles={minRoles} />}>
         <div aria-label="DAU WAU MAU table" role="region">
           {(() => {
             const { applyFilters } = require("../utils/dataFilters");
@@ -263,7 +277,7 @@ export function Effectiveness({ rbac, filters }) {
         </div>
       </Card>
 
-      <Card title="Acceptance Rate Trend" subtitle="Weekly" roleBadge={<RoleBadge minRoles={minRoles} />}>
+      <Card title="Acceptance Rate Trend" subtitle={timeSubtitle(filters, "Weekly")} roleBadge={<RoleBadge minRoles={minRoles} />}>
         <div className="grid grid-cols-1 gap-4">
           {(() => {
             const { applyFilters } = require("../utils/dataFilters");
@@ -399,7 +413,7 @@ export function TrainingAwareness({ filters }) {
           })()}
         </div>
       </Card>
-      <Card title="Support Trends" subtitle="Tickets per week">
+      <Card title="Support Trends" subtitle={`Tickets per ${timeSubtitle(filters, "Weekly").toLowerCase()}`}>
         <div className="grid grid-cols-1 gap-4">
           {(() => {
             const { applyFilters } = require("../utils/dataFilters");
@@ -790,7 +804,7 @@ export function TeamAnalytics({ filters }) {
 export function UsagePatterns({ filters }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <Card title="Usage by Hour" subtitle="UTC">
+      <Card title="Usage by Hour" subtitle={timeSubtitle(filters) === "Daily" ? "UTC · Daily" : "UTC"}>
         <div className="grid grid-cols-1 gap-4">
           {(() => {
             const { applyFilters } = require("../utils/dataFilters");
@@ -960,7 +974,7 @@ export function FeatureFlagRollout({ filters }) {
           </div>
         </div>
       </Card>
-      <Card title="Adoption Curve" subtitle="Daily">
+      <Card title="Adoption Curve" subtitle={timeSubtitle(filters, "Daily")}>
         <div className="grid grid-cols-1 gap-4">
           <LineChartLike data={mockRollout.adoptionCurve} xKey="label" yKey="users" color="#3b82f6" />
           <div aria-label="Adoption curve table" role="region">
@@ -1116,7 +1130,7 @@ export function KaviaAdminOnly({ rbac, previewBypass = false, filters }) {
           })()}
         </div>
       </Card>
-      <Card title="Latency (p95)" subtitle="Monthly" roleBadge={<RoleBadge minRoles={minRoles} />}>
+      <Card title="Latency (p95)" subtitle={timeSubtitle(filters, "Monthly")} roleBadge={<RoleBadge minRoles={minRoles} />}>
         <div className="grid grid-cols-1 gap-4">
           <LineChartLike data={mockAdminOnly.latencyMs} xKey="label" yKey="p95" color="#ef4444" />
           <div aria-label="Latency p95 table" role="region">
