@@ -19,13 +19,14 @@ export default function Layout({ sections, current, onNavigate, onToggleTheme, t
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
-      <header className="flex items-center justify-between px-4 md:px-6 py-3 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/70 backdrop-blur">
-        <div className="flex items-center gap-3">
-          <div className="w-6 h-6 rounded bg-[color:var(--kavia-orange,#E87A41)]" aria-hidden />
-          <div className="flex flex-col">
-            <span className="font-semibold">Kavia Dashboard</span>
+      {/* Header pinned visually with stable composite to avoid blur artifacts over complex content */}
+      <header className="relative z-10 flex items-center justify-between px-4 md:px-6 py-3 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/70 backdrop-blur supports-[backdrop-filter]:backdrop-blur">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-6 h-6 rounded bg-[color:var(--kavia-orange,#E87A41)] shrink-0" aria-hidden />
+          <div className="flex flex-col min-w-0">
+            <span className="font-semibold truncate">Kavia Dashboard</span>
             {/* PUBLIC_INTERFACE: Visible placeholder for Tenant Name; replaced by actual tenant from filters/auth later */}
-            <span className="text-[11px] text-slate-500 dark:text-slate-400">
+            <span className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
               Tenant: {tenantNamePlaceholder || "— Select Tenant —"}
             </span>
           </div>
@@ -51,14 +52,15 @@ export default function Layout({ sections, current, onNavigate, onToggleTheme, t
 
       {toolbar}
 
-      <main className="max-w-7xl mx-auto px-3 md:px-6 py-6 grid grid-cols-1 md:grid-cols-[240px_1fr] gap-6">
+      {/* Main grid with min-w-0 for content column to prevent overflow-induced distortion */}
+      <main className="max-w-7xl mx-auto px-3 md:px-6 py-6 grid grid-cols-1 md:grid-cols-[minmax(220px,240px)_minmax(0,1fr)] gap-6">
         <nav className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-2">
           <h2 className="sr-only">Sections</h2>
           <div className="flex flex-col gap-1">
             {sections.map((s) => navItem(s.key, s.label))}
           </div>
         </nav>
-        <section aria-live="polite">
+        <section aria-live="polite" className="min-w-0">
           {children}
         </section>
       </main>

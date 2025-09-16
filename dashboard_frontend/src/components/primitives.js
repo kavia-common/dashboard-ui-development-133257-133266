@@ -6,7 +6,7 @@ export function Card({ title, subtitle, children, actions, roleBadge, ariaLabel 
   /** Accessible card container with optional header */
   return (
     <section
-      className="bg-white dark:bg-slate-900/90 border border-gray-200 dark:border-slate-800 rounded-lg shadow-sm"
+      className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-lg shadow-sm"
       aria-label={ariaLabel || title}
     >
       {(title || actions || roleBadge || subtitle) && (
