@@ -66,13 +66,16 @@ export function DrilldownCard({ title, subtitle, children, roleBadge }) {
 
 // PUBLIC_INTERFACE
 export function Legend({ items }) {
-  /** Simple legend with colored dots */
+  /** Simple legend with colored dots that wraps to new lines as needed */
   return (
-    <div className="flex flex-wrap gap-3 text-xs">
+    <div className="flex flex-wrap gap-2 text-xs">
       {items.map((it) => (
-        <span key={it.label} className="inline-flex items-center gap-1 text-slate-600 dark:text-slate-300">
-          <span className="inline-block w-2.5 h-2.5 rounded-full" style={{ backgroundColor: it.color }} />
-          {it.label}
+        <span
+          key={it.label}
+          className="inline-flex items-center gap-1 text-slate-600 dark:text-slate-300 whitespace-normal break-words"
+        >
+          <span className="inline-block w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: it.color }} />
+          <span className="break-words">{it.label}</span>
         </span>
       ))}
     </div>
@@ -134,16 +137,23 @@ export function PieChartLike({ parts }) {
   const gradient = `conic-gradient(${stops.join(", ")})`;
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex flex-wrap items-center gap-4">
       <div
-        className="w-28 h-28 rounded-full relative"
+        className="w-28 h-28 rounded-full relative shrink-0"
         style={{ backgroundImage: gradient }}
         role="img"
         aria-label="pie distribution"
       >
         <div className="absolute inset-3 rounded-full bg-white dark:bg-slate-900" />
       </div>
-      <Legend items={parts.map((p) => ({ label: `${p.label} (${Math.round((p.value / total) * 100)}%)`, color: p.color || "#94a3b8" }))} />
+      <div className="min-w-0">
+        <Legend
+          items={parts.map((p) => ({
+            label: `${p.label} (${Math.round((p.value / total) * 100)}%)`,
+            color: p.color || "#94a3b8",
+          }))}
+        />
+      </div>
     </div>
   );
 }
@@ -174,13 +184,22 @@ export function Gauge({ value, max = 100, label = "Gauge", color = "#f59e0b" }) 
 
 // PUBLIC_INTERFACE
 export function SimpleTable({ columns, rows, onRowClick }) {
+  /**
+   * Table optimized for vertical stacking and wrapping:
+   * - Remove horizontal auto-scroll to prevent sideways scroll on small screens
+   * - Allow cell content to wrap using break-words/whitespace-normal
+   * - Use min-w-0 on wrapper to allow shrinking and wrapping inside grid/flex parents
+   */
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-left border-collapse">
+    <div className="min-w-0">
+      <table className="w-full text-left border-collapse table-fixed">
         <thead className="bg-slate-50 dark:bg-slate-900">
           <tr>
             {columns.map((c) => (
-              <th key={c.key} className="px-3 py-2 text-xs font-semibold text-slate-600 dark:text-slate-300 border-b border-slate-200 dark:border-slate-700">
+              <th
+                key={c.key}
+                className="px-3 py-2 text-xs font-semibold text-slate-600 dark:text-slate-300 border-b border-slate-200 dark:border-slate-700 text-ellipsis overflow-hidden whitespace-normal break-words align-top"
+              >
                 {c.header}
               </th>
             ))}
@@ -194,7 +213,10 @@ export function SimpleTable({ columns, rows, onRowClick }) {
               onClick={() => onRowClick && onRowClick(r)}
             >
               {columns.map((c) => (
-                <td key={c.key} className="px-3 py-2 text-xs text-slate-700 dark:text-slate-200 border-b border-slate-200 dark:border-slate-700">
+                <td
+                  key={c.key}
+                  className="px-3 py-2 text-xs text-slate-700 dark:text-slate-200 border-b border-slate-200 dark:border-slate-700 whitespace-normal break-words align-top"
+                >
                   {typeof c.render === "function" ? c.render(r[c.key], r) : r[c.key]}
                 </td>
               ))}

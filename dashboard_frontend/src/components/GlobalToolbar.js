@@ -30,7 +30,7 @@ export default function GlobalToolbar({
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-3">
               {/* Wrap controls across lines; remove forced horizontal scroll to avoid sideways scrolling */}
               <div className="flex flex-wrap gap-2 items-center min-w-0">
-                <label className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap" htmlFor="metric-group">
+                <label className="text-xs text-slate-500 dark:text-slate-400" htmlFor="metric-group">
                   Metric Group
                 </label>
                 <select
@@ -61,7 +61,7 @@ export default function GlobalToolbar({
                   <option value="admin">Admin Only</option>
                 </select>
 
-                <label className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap" htmlFor="time">
+                <label className="text-xs text-slate-500 dark:text-slate-400" htmlFor="time">
                   Time
                 </label>
                 <select

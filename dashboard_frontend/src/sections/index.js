@@ -109,7 +109,7 @@ export function AdoptionEngagement({ rbac, filters }) {
       </Card>
 
       <Card title="Module Usage" subtitle={`${timeSubtitle(filters)} · Interactions by module`} roleBadge={<RoleBadge minRoles={minRoles} />}>
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 gap-4 min-w-0">
           {(() => {
             const { applyFilters } = require("../utils/dataFilters");
             const filtered = applyFilters({
@@ -137,7 +137,7 @@ export function AdoptionEngagement({ rbac, filters }) {
       </Card>
 
       <Card title="Department Growth Trend" subtitle={`${timeSubtitle(filters)} %`} roleBadge={<RoleBadge minRoles={minRoles} />}>
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 gap-4 min-w-0">
           {(() => {
             const { applyFilters } = require("../utils/dataFilters");
             const filtered = applyFilters({
@@ -165,7 +165,7 @@ export function AdoptionEngagement({ rbac, filters }) {
       </Card>
 
       <Card title="Discovery Funnel" subtitle={`${timeSubtitle(filters)} · From discovered to retained`} roleBadge={<RoleBadge minRoles={minRoles} />}>
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 gap-4 min-w-0">
           {(() => {
             const { applyFilters } = require("../utils/dataFilters");
             const filtered = applyFilters({
@@ -250,7 +250,7 @@ export function Effectiveness({ rbac, filters }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <Card title="AI Outcomes" subtitle="Accepted vs Edited vs Discarded" roleBadge={<RoleBadge minRoles={minRoles} />}>
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 gap-4 min-w-0">
           {(() => {
             const { applyFilters } = require("../utils/dataFilters");
             const filtered = applyFilters({
@@ -278,7 +278,7 @@ export function Effectiveness({ rbac, filters }) {
       </Card>
 
       <Card title="Acceptance Rate Trend" subtitle={timeSubtitle(filters, "Weekly")} roleBadge={<RoleBadge minRoles={minRoles} />}>
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 gap-4 min-w-0">
           {(() => {
             const { applyFilters } = require("../utils/dataFilters");
             const filtered = applyFilters({
@@ -414,7 +414,7 @@ export function TrainingAwareness({ filters }) {
         </div>
       </Card>
       <Card title="Support Trends" subtitle={`Tickets per ${timeSubtitle(filters, "Weekly").toLowerCase()}`}>
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 gap-4 min-w-0">
           {(() => {
             const { applyFilters } = require("../utils/dataFilters");
             const filtered = applyFilters({
@@ -805,7 +805,7 @@ export function UsagePatterns({ filters }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <Card title="Usage by Hour" subtitle={timeSubtitle(filters) === "Daily" ? "UTC · Daily" : "UTC"}>
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 gap-4 min-w-0">
           {(() => {
             const { applyFilters } = require("../utils/dataFilters");
             // Map and enrich with cyclical team/dept to allow filters to act
@@ -843,7 +843,7 @@ export function UsagePatterns({ filters }) {
         </div>
       </Card>
       <Card title="Geographic Usage" subtitle="Regions">
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 gap-4 min-w-0">
           {(() => {
             const { applyFilters } = require("../utils/dataFilters");
             const filtered = applyFilters({
@@ -874,7 +874,7 @@ export function UsagePatterns({ filters }) {
       <Card title="Geo Compliance" subtitle="Region compliance status">
         {/* Assumption: Until a geo map is integrated, visualize compliance via donut + per-region bars.
             Replace with real map and API-fed metrics when available. */}
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 gap-4 min-w-0">
           {/* Donut for overall compliance ratio */}
           <div>
             <div className="text-xs text-slate-500 dark:text-slate-400 mb-1">Overall Compliance</div>
