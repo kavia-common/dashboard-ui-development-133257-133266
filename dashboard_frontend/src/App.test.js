@@ -1,10 +1,8 @@
-import { render, screen } from "@testing-library/react";
-import App from "./App";
+import { render, screen } from '@testing-library/react';
+import App from './App';
 
-// PUBLIC_INTERFACE
-test("renders dashboard header", () => {
+test('renders learn react link', () => {
   render(<App />);
-  // Header in Layout shows "Kavia Dashboard"
-  const title = screen.getByText(/Kavia Dashboard/i);
-  expect(title).toBeInTheDocument();
+  const linkElement = screen.getByText(/learn react/i);
+  expect(linkElement).toBeInTheDocument();
 });
