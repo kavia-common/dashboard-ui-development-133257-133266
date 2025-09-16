@@ -12,7 +12,9 @@ export default function GlobalToolbar({
   onSearch,
   roleQuickFilter,
   exportTargetRef,
+  onMetricGroupChange,
 }) {
+  // Ensure we can inform parent about metric group changes to switch sections immediately
   const handle = (key, val) => onChange && onChange({ ...filters, [key]: val });
   const updateSort = (by, dir) => onChange && onChange({ ...filters, sort: { by, dir } });
 
@@ -29,7 +31,15 @@ export default function GlobalToolbar({
                 id="metric-group"
                 aria-label="Metric Group"
                 value={filters.metricGroup || "adoption"}
-                onChange={(e) => handle("metricGroup", e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  // Update filters first
+                  handle("metricGroup", value);
+                  // Notify parent to switch main content immediately
+                  if (typeof onMetricGroupChange === "function") {
+                    onMetricGroupChange(value);
+                  }
+                }}
                 className="px-2 py-1 text-sm rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200"
                 title="Choose which metric group the filters target. This avoids separate views for each table."
               >

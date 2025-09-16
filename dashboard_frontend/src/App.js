@@ -70,10 +70,42 @@ function App() {
     { key: "admin", label: "Kavia-Admin Only (Preview Access)" },
   ];
 
+  // Map metricGroup values to section keys
+  const metricGroupToSection = {
+    adoption: "adoption",
+    effectiveness: "effectiveness",
+    training: "training",
+    org: "org",
+    feedback: "feedback",
+    team: "team",
+    usage: "usage",
+    featureflags: "featureflags",
+    cost: "cost",
+    admin: "admin",
+  };
+
+  // Wrap filter change to also update the current section when metricGroup changes
+  const onToolbarChange = (next) => {
+    // If metricGroup changed, navigate to that section and clear incompatible sorts
+    if (next.metricGroup && next.metricGroup !== filters.metricGroup) {
+      const nextSection = metricGroupToSection[next.metricGroup] || "adoption";
+      setCurrent(nextSection);
+      // Reset sort when switching groups to prevent stale/unrelated sort keys
+      next = { ...next, sort: { by: "", dir: "desc" } };
+    }
+    setFilters(next);
+  };
+
   const toolbar = (
     <GlobalToolbar
       filters={filters}
-      onChange={setFilters}
+      onChange={onToolbarChange}
+      onMetricGroupChange={(group) => {
+        const nextSection = metricGroupToSection[group] || "adoption";
+        if (nextSection !== current) {
+          setCurrent(nextSection);
+        }
+      }}
       onExport={async (fmt, node) => {
         if (fmt === "csv") {
           // CSV export requires the currently focused table; in preview, export nothing-specific
