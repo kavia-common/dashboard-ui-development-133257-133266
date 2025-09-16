@@ -4,10 +4,53 @@ export function textIncludes(haystack, needle) {
   return String(haystack).toLowerCase().includes(String(needle).toLowerCase());
 }
 
+/**
+ * INTERNAL: Determine if a row matches the selected time preset.
+ * Supports:
+ * - Explicit row.period === 'daily'|'weekly'|'monthly'|'realtime'
+ * - Label conventions: 'D#' for daily, 'W#' for weekly, 'M#' for monthly
+ * Falls back to allowing all rows if no clear mapping exists or preset is 'custom'.
+ */
+function matchesTimePreset(row, preset) {
+  if (!preset || preset === "custom") return true;
+
+  // Explicit period field takes priority if present.
+  const rp = (row?.period || row?.timePreset || "").toString().toLowerCase();
+  if (rp) {
+    if (preset === "realtime") return rp === "realtime";
+    if (preset === "daily") return rp === "daily";
+    if (preset === "weekly") return rp === "weekly";
+    if (preset === "monthly") return rp === "monthly";
+  }
+
+  // Infer from common label patterns used across mocks
+  const label = (row?.label || row?.Period || row?.periodLabel || "").toString();
+  const isDaily = /^D\d+/i.test(label);
+  const isWeekly = /^W\d+/i.test(label);
+  const isMonthly = /^M\d+/i.test(label);
+
+  if (preset === "daily") {
+    // If dataset uses daily pattern, keep only daily; otherwise keep all (dataset not time-bucketed by day)
+    return isDaily || (!isWeekly && !isMonthly);
+  }
+  if (preset === "weekly") {
+    return isWeekly || (!isDaily && !isMonthly);
+  }
+  if (preset === "monthly") {
+    return isMonthly || (!isDaily && !isWeekly);
+  }
+  if (preset === "realtime") {
+    // Realtime generally maps to "most recent slice". With static mocks we pass all.
+    return true;
+  }
+  return true;
+}
+
 // PUBLIC_INTERFACE
 export function applyFilters({ rows, filters, searchableKeys = [], sortNumericFallbackKey = "" }) {
   /**
    * Apply search text, entity filters (team, user, feature, department, geography),
+   * time preset filtering (realtime/daily/weekly/monthly/custom),
    * and optional sorting to tabular/array data.
    * - rows: array of objects
    * - filters: global filters from App
@@ -20,8 +63,14 @@ export function applyFilters({ rows, filters, searchableKeys = [], sortNumericFa
   const feature = (filters?.feature || filters?.module || "").trim();
   const department = (filters?.department || "").trim();
   const geography = (filters?.geography || "").trim();
+  const timePreset = (filters?.time?.preset || "").toLowerCase();
 
   let out = Array.isArray(rows) ? [...rows] : [];
+
+  // Time preset filter first so subsequent filters act on the right subset.
+  if (timePreset) {
+    out = out.filter((r) => matchesTimePreset(r, timePreset));
+  }
 
   if (search) {
     out = out.filter((r) =>
