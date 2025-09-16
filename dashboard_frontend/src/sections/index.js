@@ -53,15 +53,43 @@ export function AdoptionEngagement({ rbac, filters }) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <div className="text-xs mb-2">DAU</div>
-            <LineChartLike data={mockTimeSeries} xKey="label" yKey="dau" color="#ef4444" />
+            {(() => {
+              const { applyFilters } = require("../utils/dataFilters");
+              // Provide team/department searchability via label and values only react to search/sort where applicable
+              const filtered = applyFilters({
+                rows: mockTimeSeries,
+                filters,
+                searchableKeys: ["label","dau","wau","mau"],
+                sortNumericFallbackKey: "",
+              });
+              return <LineChartLike data={filtered} xKey="label" yKey="dau" color="#ef4444" />;
+            })()}
           </div>
           <div>
             <div className="text-xs mb-2">WAU</div>
-            <LineChartLike data={mockTimeSeries} xKey="label" yKey="wau" color="#3b82f6" />
+            {(() => {
+              const { applyFilters } = require("../utils/dataFilters");
+              const filtered = applyFilters({
+                rows: mockTimeSeries,
+                filters,
+                searchableKeys: ["label","dau","wau","mau"],
+                sortNumericFallbackKey: "",
+              });
+              return <LineChartLike data={filtered} xKey="label" yKey="wau" color="#3b82f6" />;
+            })()}
           </div>
           <div>
             <div className="text-xs mb-2">MAU</div>
-            <LineChartLike data={mockTimeSeries} xKey="label" yKey="mau" color="#10b981" />
+            {(() => {
+              const { applyFilters } = require("../utils/dataFilters");
+              const filtered = applyFilters({
+                rows: mockTimeSeries,
+                filters,
+                searchableKeys: ["label","dau","wau","mau"],
+                sortNumericFallbackKey: "",
+              });
+              return <LineChartLike data={filtered} xKey="label" yKey="mau" color="#10b981" />;
+            })()}
           </div>
         </div>
       </Card>
@@ -73,7 +101,7 @@ export function AdoptionEngagement({ rbac, filters }) {
             const filtered = applyFilters({
               rows: mockModuleUsage,
               filters,
-              searchableKeys: ["module", "count"],
+              searchableKeys: ["module", "count", "dept", "team"],
               sortNumericFallbackKey: "count",
             });
             return (
@@ -101,7 +129,7 @@ export function AdoptionEngagement({ rbac, filters }) {
             const filtered = applyFilters({
               rows: mockDepartments,
               filters,
-              searchableKeys: ["dept", "growth"],
+              searchableKeys: ["dept", "growth", "region"],
               sortNumericFallbackKey: "growth",
             });
             return (
@@ -173,10 +201,13 @@ export function AdoptionEngagement({ rbac, filters }) {
         <div aria-label="DAU WAU MAU table" role="region">
           {(() => {
             const { applyFilters } = require("../utils/dataFilters");
+            const teams = ["Core","Infra","Apps","QA"];
+            const depts = ["Engineering","Engineering","Product","Support"];
+            const base = mockTimeSeries.map((r, i) => ({ ...r, team: teams[i % teams.length], dept: depts[i % depts.length] }));
             const filtered = applyFilters({
-              rows: mockTimeSeries,
+              rows: base,
               filters,
-              searchableKeys: ["label", "dau", "wau", "mau"],
+              searchableKeys: ["label", "dau", "wau", "mau", "team", "dept"],
               sortNumericFallbackKey: filters?.sort?.by && ["dau","wau","mau"].includes(filters.sort.by) ? filters.sort.by : "",
             });
             return (
@@ -353,7 +384,7 @@ export function TrainingAwareness({ filters }) {
             const filtered = applyFilters({
               rows: mockTrainingFeatureAdoption,
               filters,
-              searchableKeys: ["feature", "percent"],
+              searchableKeys: ["feature", "percent", "team", "dept"],
               sortNumericFallbackKey: "percent",
             });
             return (
@@ -524,7 +555,7 @@ export function FeedbackProblemDetection({ filters }) {
             const filtered = applyFilters({
               rows: mockFeedbackFunnel,
               filters,
-              searchableKeys: ["stage", "value"],
+              searchableKeys: ["stage", "value", "dept"],
               sortNumericFallbackKey: "value",
             });
             return (
@@ -562,6 +593,7 @@ export function FeedbackProblemDetection({ filters }) {
                   <SimpleTable
                     columns={[
                       { key: "label", header: "Week" },
+                      { key: "team", header: "Team" },
                       { key: "tickets", header: "Tickets" },
                       { key: "sla", header: "SLA Met", render: (v) => (v ? "Yes" : "No") },
                     ]}
@@ -580,7 +612,7 @@ export function FeedbackProblemDetection({ filters }) {
           const filtered = applyFilters({
             rows: mockFeedbackSentiment,
             filters,
-            searchableKeys: ["id", "team", "category", "sentiment", "score"],
+            searchableKeys: ["id", "team", "category", "sentiment", "score", "dept", "region"],
             sortNumericFallbackKey: "score",
           });
           return (
@@ -626,7 +658,7 @@ export function FeedbackProblemDetection({ filters }) {
           const filtered = applyFilters({
             rows: mockErrorLogs,
             filters,
-            searchableKeys: ["ts", "level", "component", "message"],
+            searchableKeys: ["ts", "level", "component", "message", "dept", "region", "team", "user"],
             sortNumericFallbackKey: "",
           });
           return (
@@ -649,7 +681,7 @@ export function FeedbackProblemDetection({ filters }) {
           const filtered = applyFilters({
             rows: mockAudit,
             filters,
-            searchableKeys: ["ts", "user", "action", "detail"],
+            searchableKeys: ["ts", "user", "action", "detail", "team", "dept", "region"],
             sortNumericFallbackKey: "",
           });
           return (
@@ -693,7 +725,7 @@ export function TeamAnalytics({ filters }) {
             const filtered = applyFilters({
               rows: mockTeamAdoption,
               filters,
-              searchableKeys: ["team", "score"],
+              searchableKeys: ["team", "score", "dept"],
               sortNumericFallbackKey: "score",
             });
             return (
@@ -762,11 +794,20 @@ export function UsagePatterns({ filters }) {
         <div className="grid grid-cols-1 gap-4">
           {(() => {
             const { applyFilters } = require("../utils/dataFilters");
-            const mapped = mockUsageByTime.map(d => ({ label: d.hour, count: d.count, hour: d.hour }));
+            // Map and enrich with cyclical team/dept to allow filters to act
+            const teams = ["Core","Infra","Apps","QA"];
+            const depts = ["Engineering","Engineering","Product","Support"];
+            const mapped = mockUsageByTime.map((d, i) => ({
+              label: d.hour,
+              count: d.count,
+              hour: d.hour,
+              team: teams[i % teams.length],
+              dept: depts[i % depts.length],
+            }));
             const filtered = applyFilters({
               rows: mapped,
               filters,
-              searchableKeys: ["label", "count", "hour"],
+              searchableKeys: ["label", "count", "hour", "team", "dept"],
               sortNumericFallbackKey: "count",
             });
             return (
@@ -776,9 +817,10 @@ export function UsagePatterns({ filters }) {
                   <SimpleTable
                     columns={[
                       { key: "hour", header: "Hour (UTC)" },
+                      { key: "team", header: "Team" },
                       { key: "count", header: "Sessions" },
                     ]}
-                    rows={filtered.map(({ hour, count }) => ({ hour, count }))}
+                    rows={filtered.map(({ hour, team, count }) => ({ hour, team, count }))}
                   />
                 </div>
               </>
@@ -793,7 +835,7 @@ export function UsagePatterns({ filters }) {
             const filtered = applyFilters({
               rows: mockGeoUsage,
               filters,
-              searchableKeys: ["region", "count"],
+              searchableKeys: ["region", "count", "dept", "team"],
               sortNumericFallbackKey: "count",
             });
             return (
@@ -803,6 +845,8 @@ export function UsagePatterns({ filters }) {
                   <SimpleTable
                     columns={[
                       { key: "region", header: "Region" },
+                      { key: "dept", header: "Department" },
+                      { key: "team", header: "Team" },
                       { key: "count", header: "Sessions" },
                     ]}
                     rows={filtered}
@@ -964,8 +1008,8 @@ export function CostCredits({ rbac, filters }) {
           const filtered = applyFilters({
             rows: mockTopUsersCredits,
             filters,
-            searchableKeys: ["user", "team", "used", "balance", "cost"],
-            sortNumericFallbackKey: "used",
+            searchableKeys: ["user", "team", "used", "balance", "cost", "dept", "region"],
+            sortNumericFallbackKey: filters?.sort?.by && ["used","balance","cost"].includes(filters.sort.by) ? filters.sort.by : "used",
           });
           return (
             <SimpleTable

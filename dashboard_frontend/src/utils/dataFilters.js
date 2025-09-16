@@ -45,6 +45,12 @@ export function applyFilters({ rows, filters, searchableKeys = [], sortNumericFa
       const an = typeof av === "number" ? av : Number(av);
       const bn = typeof bv === "number" ? bv : Number(bv);
       if (!Number.isNaN(an) && !Number.isNaN(bn)) return (an - bn) * dir;
+
+      // handle dates/iso timestamps gracefully
+      const ad = Date.parse(av);
+      const bd = Date.parse(bv);
+      if (!Number.isNaN(ad) && !Number.isNaN(bd)) return (ad - bd) * dir;
+
       return String(av ?? "").localeCompare(String(bv ?? "")) * dir;
     });
   }
