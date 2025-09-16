@@ -16,6 +16,13 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
   'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
   sans-serif;
+  /* Prevent global horizontal scroll when toolbars overflow; local containers will scroll instead */
+  overflow-x: hidden;
+}
+
+/* Enable momentum scrolling for overflow containers (e.g., toolbar filter cluster) */
+.overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
 }
 
 code {

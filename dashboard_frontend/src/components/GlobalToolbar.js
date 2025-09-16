@@ -24,11 +24,13 @@ export default function GlobalToolbar({
       <div className="backdrop-blur supports-[backdrop-filter]:backdrop-blur">
         <div className="max-w-7xl mx-auto px-3 md:px-6 py-3 flex flex-col gap-3">
           {/* Unified Controls Area */}
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-3">
+          {/* Give filters section priority width and allow it to shrink with min-w-0 to prevent overflow push */}
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_auto] gap-3 items-stretch">
             {/* Filters cluster */}
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-3 overflow-x-auto">
+              {/* Wrap and allow horizontal scroll if too many items; min-w-0 keeps flex children from forcing overflow */}
               <div className="flex flex-wrap gap-2 items-center min-w-0">
-                <label className="text-xs text-slate-500 dark:text-slate-400" htmlFor="metric-group">
+                <label className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap" htmlFor="metric-group">
                   Metric Group
                 </label>
                 <select
@@ -44,7 +46,7 @@ export default function GlobalToolbar({
                       onMetricGroupChange(value);
                     }
                   }}
-                  className="px-2 py-1 text-sm rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200"
+                  className="px-2 py-1 text-sm rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 max-w-[14rem] truncate"
                   title="Choose which metric group the filters target. This avoids separate views for each table."
                 >
                   <option value="adoption">Adoption & Engagement</option>
@@ -59,7 +61,7 @@ export default function GlobalToolbar({
                   <option value="admin">Admin Only</option>
                 </select>
 
-                <label className="text-xs text-slate-500 dark:text-slate-400" htmlFor="time">
+                <label className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap" htmlFor="time">
                   Time
                 </label>
                 <select
@@ -67,7 +69,7 @@ export default function GlobalToolbar({
                   aria-label="Time range"
                   value={filters.time?.preset || "monthly"}
                   onChange={(e) => handle("time", { preset: e.target.value })}
-                  className="px-2 py-1 text-sm rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200"
+                  className="px-2 py-1 text-sm rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 max-w-[10rem] truncate"
                 >
                   <option value="realtime">Real-time</option>
                   <option value="daily">Daily</option>
@@ -78,49 +80,49 @@ export default function GlobalToolbar({
 
                 {/* Assumption: Tenant name is an input here and mirrored in header placeholder */}
                 <input
-                  className="px-2 py-1 text-sm rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200"
+                  className="px-2 py-1 text-sm rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 w-[11rem] sm:w-[12rem] md:w-[14rem] lg:w-[12rem] xl:w-[14rem] min-w-0"
                   placeholder="Tenant Name"
                   aria-label="Tenant"
                   value={filters.tenant || ""}
                   onChange={(e) => handle("tenant", e.target.value)}
                 />
                 <input
-                  className="px-2 py-1 text-sm rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200"
+                  className="px-2 py-1 text-sm rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 w-[9.5rem] sm:w-[10rem] md:w-[11rem] min-w-0"
                   placeholder="Department"
                   aria-label="Department"
                   value={filters.department || ""}
                   onChange={(e) => handle("department", e.target.value)}
                 />
                 <input
-                  className="px-2 py-1 text-sm rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200"
+                  className="px-2 py-1 text-sm rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 w-[8.5rem] sm:w-[9rem] md:w-[10rem] min-w-0"
                   placeholder="Team"
                   aria-label="Team"
                   value={filters.team || ""}
                   onChange={(e) => handle("team", e.target.value)}
                 />
                 <input
-                  className="px-2 py-1 text-sm rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200"
+                  className="px-2 py-1 text-sm rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 w-[8.5rem] sm:w-[9rem] md:w-[10rem] min-w-0"
                   placeholder="User"
                   aria-label="User"
                   value={filters.user || ""}
                   onChange={(e) => handle("user", e.target.value)}
                 />
                 <input
-                  className="px-2 py-1 text-sm rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200"
+                  className="px-2 py-1 text-sm rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 w-[12rem] sm:w-[12.5rem] md:w-[13rem] min-w-0"
                   placeholder="Feature/Module"
                   aria-label="Feature or Module"
                   value={filters.feature || filters.module || ""}
                   onChange={(e) => handle("feature", e.target.value)}
                 />
                 <input
-                  className="px-2 py-1 text-sm rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200"
+                  className="px-2 py-1 text-sm rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 w-[12rem] sm:w-[12.5rem] md:w-[13rem] min-w-0"
                   placeholder="Geography/Timezone"
                   aria-label="Geography or Timezone"
                   value={filters.geography || ""}
                   onChange={(e) => handle("geography", e.target.value)}
                 />
                 {!!roleQuickFilter && (
-                  <span className="text-[10px] px-2 py-1 rounded border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300">
+                  <span className="text-[10px] px-2 py-1 rounded border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 whitespace-nowrap max-w-[14rem] overflow-hidden text-ellipsis">
                     Role: {roleQuickFilter}
                   </span>
                 )}
@@ -128,12 +130,13 @@ export default function GlobalToolbar({
             </div>
 
             {/* Actions cluster */}
-            <div className="flex items-center justify-end gap-2">
+            {/* Allow wrap on small screens and prevent this group from forcing overflow */}
+            <div className="flex flex-wrap items-center justify-end gap-2 min-w-0">
               {/* Sorting controls vary by metric group; provide common fields */}
               <div className="flex items-center gap-2">
-                <label className="text-xs text-slate-500 dark:text-slate-400">Sort by</label>
+                <label className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">Sort by</label>
                 <select
-                  className="px-2 py-1 text-sm rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200"
+                  className="px-2 py-1 text-sm rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 max-w-[10rem]"
                   value={filters.sort?.by || ""}
                   onChange={(e) => updateSort(e.target.value, filters.sort?.dir || "desc")}
                   aria-label="Sort by"
@@ -170,7 +173,7 @@ export default function GlobalToolbar({
                   )}
                 </select>
                 <select
-                  className="px-2 py-1 text-sm rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200"
+                  className="px-2 py-1 text-sm rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 max-w-[7rem]"
                   value={filters.sort?.dir || "desc"}
                   onChange={(e) => updateSort(filters.sort?.by || "", e.target.value)}
                   aria-label="Sort direction"
@@ -181,7 +184,7 @@ export default function GlobalToolbar({
                 </select>
               </div>
               <input
-                className="px-3 py-1.5 text-sm rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200"
+                className="px-3 py-1.5 text-sm rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 w-[12rem] min-w-0"
                 placeholder="Search"
                 aria-label="Search"
                 value={filters.search || ""}
@@ -192,21 +195,21 @@ export default function GlobalToolbar({
               <button
                 type="button"
                 onClick={() => onExport && onExport("csv")}
-                className="px-3 py-1.5 rounded text-sm bg-slate-900 text-white dark:bg-white dark:text-slate-900"
+                className="px-3 py-1.5 rounded text-sm bg-slate-900 text-white dark:bg-white dark:text-slate-900 whitespace-nowrap"
               >
                 Export CSV
               </button>
               <button
                 type="button"
                 onClick={() => onExport && onExport("png", exportTargetRef?.current)}
-                className="px-3 py-1.5 rounded text-sm bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-100 border border-slate-300 dark:border-slate-700"
+                className="px-3 py-1.5 rounded text-sm bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-100 border border-slate-300 dark:border-slate-700 whitespace-nowrap"
               >
                 Export PNG
               </button>
               <button
                 type="button"
                 onClick={() => onExport && onExport("pdf", exportTargetRef?.current)}
-                className="px-3 py-1.5 rounded text-sm bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-100 border border-slate-300 dark:border-slate-700"
+                className="px-3 py-1.5 rounded text-sm bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-100 border border-slate-300 dark:border-slate-700 whitespace-nowrap"
               >
                 Export PDF
               </button>
