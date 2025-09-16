@@ -175,7 +175,7 @@ export function Gauge({ value, max = 100, label = "Gauge", color = "#f59e0b" }) 
 // PUBLIC_INTERFACE
 export function SimpleTable({ columns, rows, onRowClick }) {
   return (
-    <div className="overflow-auto">
+    <div className="overflow-x-auto">
       <table className="w-full text-left border-collapse">
         <thead className="bg-slate-50 dark:bg-slate-900">
           <tr>

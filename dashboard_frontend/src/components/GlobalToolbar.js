@@ -27,8 +27,8 @@ export default function GlobalToolbar({
           {/* Give filters section priority width and allow it to shrink with min-w-0 to prevent overflow push */}
           <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_auto] gap-3 items-stretch">
             {/* Filters cluster */}
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-3 overflow-x-auto">
-              {/* Wrap and allow horizontal scroll if too many items; min-w-0 keeps flex children from forcing overflow */}
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-3">
+              {/* Wrap controls across lines; remove forced horizontal scroll to avoid sideways scrolling */}
               <div className="flex flex-wrap gap-2 items-center min-w-0">
                 <label className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap" htmlFor="metric-group">
                   Metric Group
@@ -122,7 +122,7 @@ export default function GlobalToolbar({
                   onChange={(e) => handle("geography", e.target.value)}
                 />
                 {!!roleQuickFilter && (
-                  <span className="text-[10px] px-2 py-1 rounded border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 whitespace-nowrap max-w-[14rem] overflow-hidden text-ellipsis">
+                  <span className="text-[10px] px-2 py-1 rounded border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 break-words">
                     Role: {roleQuickFilter}
                   </span>
                 )}
