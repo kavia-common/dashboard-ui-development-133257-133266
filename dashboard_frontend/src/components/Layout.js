@@ -1,7 +1,7 @@
 import React from "react";
 
 // PUBLIC_INTERFACE
-export default function Layout({ sections, current, onNavigate, onToggleTheme, theme, toolbar, children, previewNotice }) {
+export default function Layout({ sections, current, onNavigate, onToggleTheme, theme, toolbar, children, previewNotice, tenantNamePlaceholder }) {
   const navItem = (key, label) => {
     const active = current === key;
     return (
@@ -9,7 +9,7 @@ export default function Layout({ sections, current, onNavigate, onToggleTheme, t
         key={key}
         onClick={() => onNavigate(key)}
         className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors
-          ${active ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900" : "text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"}`}
+          ${active ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900" : "text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/80"}`}
         aria-current={active ? "page" : undefined}
       >
         {label}
@@ -20,9 +20,15 @@ export default function Layout({ sections, current, onNavigate, onToggleTheme, t
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
       <header className="flex items-center justify-between px-4 md:px-6 py-3 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/70 backdrop-blur">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <div className="w-6 h-6 rounded bg-[color:var(--kavia-orange,#E87A41)]" aria-hidden />
-          <span className="font-semibold">Kavia Dashboard</span>
+          <div className="flex flex-col">
+            <span className="font-semibold">Kavia Dashboard</span>
+            {/* PUBLIC_INTERFACE: Visible placeholder for Tenant Name; replaced by actual tenant from filters/auth later */}
+            <span className="text-[11px] text-slate-500 dark:text-slate-400">
+              Tenant: {tenantNamePlaceholder || "— Select Tenant —"}
+            </span>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <button

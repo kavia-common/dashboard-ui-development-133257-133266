@@ -119,6 +119,10 @@ export const mockTimeHeatmap = {
   ),
 };
 
+/**
+ * Assumption: Team-Feature intensity values are uniformly distributed demo numbers (10-100)
+ * to populate previously empty heatmap areas. Replace with real aggregated metrics when APIs are wired.
+ */
 export const mockTeamFeatureHeatmap = {
   teams: ["Core", "Infra", "Apps", "QA", "Growth", "Ops"],
   features: ["Inspect", "Plan", "Build", "Docs", "Review"],

@@ -29,6 +29,7 @@ function App() {
   const [current, setCurrent] = useState("adoption");
   const [filters, setFilters] = useState({
     time: { preset: "monthly" },
+    metricGroup: "adoption",
     tenant: "",
     department: "",
     team: "",
@@ -136,6 +137,7 @@ function App() {
       onToggleTheme={toggleTheme}
       theme={theme}
       toolbar={toolbar}
+      tenantNamePlaceholder={filters.tenant || "Demo Tenant"} // PUBLIC_INTERFACE: tenant name placeholder source
       // Show a global banner to indicate preview-only RBAC bypass
       previewNotice={PREVIEW_MODE_SHOW_ADMIN ? "Preview/Test Mode: Kavia-Admin Only section is visible to all roles for UI review. Do not use this as production access control." : undefined}
     >

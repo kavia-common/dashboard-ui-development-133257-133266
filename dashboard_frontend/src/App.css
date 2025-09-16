@@ -8,9 +8,9 @@
 
 [data-theme="dark"] {
   --bg-primary: #0b0f19; /* near slate-950 */
-  --bg-secondary: #111827; /* gray-900 */
-  --text-primary: #f9fafb; /* gray-50 */
-  --border-color: #334155; /* slate-700 */
+  --bg-secondary: #0f172a; /* slate-900 for deeper contrast */
+  --text-primary: #f8fafc; /* slate-50 */
+  --border-color: #1f2937; /* gray-800 for clearer delineation */
 }
 
 /* Helper for focus-visible outline when not relying on Tailwind ring */

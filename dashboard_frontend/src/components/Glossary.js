@@ -19,7 +19,7 @@ export function InfoTooltip({ term, definition }) {
       {open && (
         <div
           role="tooltip"
-          className="absolute top-full mt-1 z-20 w-64 p-2 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded shadow"
+          className="absolute top-full mt-1 z-20 w-64 p-2 text-xs bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded shadow"
         >
           <div className="font-semibold text-slate-800 dark:text-slate-100 mb-1">{term}</div>
           <div className="text-slate-600 dark:text-slate-300">{definition}</div>

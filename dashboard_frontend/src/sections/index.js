@@ -482,12 +482,14 @@ export function TeamAnalytics() {
           />
         </div>
       </Card>
-      <Card title="Feature-Team Heatmap" subtitle="Placeholder">
-        <div className="grid grid-cols-6 gap-1">
-          {Array.from({ length: 36 }).map((_, i) => (
-            <div key={i} className="aspect-square rounded" style={{ backgroundColor: `hsl(${(i * 10) % 360} 70% 70%)` }} />
-          ))}
-        </div>
+      <DrilldownCard title="Feature-Team Heatmap" subtitle="Intensity of usage (assumed demo data)">
+        {/* Assumption: Using mockTeamFeatureHeatmap for previously empty grid to reflect real team-feature intensity */}
+        <HeatmapGrid
+          values={mockTeamFeatureHeatmap.values}
+          xLabels={mockTeamFeatureHeatmap.features}
+          yLabels={mockTeamFeatureHeatmap.teams}
+          valueToColor={(v) => `hsl(${(220 - v) * 2} 80% ${Math.max(28, 92 - v)}%)`}
+        />
         <div aria-label="Team feature usage table" role="region" className="mt-4">
           <SimpleTable
             columns={[
@@ -496,14 +498,15 @@ export function TeamAnalytics() {
               { key: "usage", header: "Usage Count" },
             ]}
             rows={[
-              { team: "Core", topFeature: "Build", usage: 340 },
-              { team: "Infra", topFeature: "Inspect", usage: 280 },
-              { team: "Apps", topFeature: "Plan", usage: 240 },
-              { team: "QA", topFeature: "Inspect", usage: 190 },
+              // Assumption: Derive top feature rough counts from heatmap first column for illustrative purposes
+              { team: mockTeamFeatureHeatmap.teams[0], topFeature: "Build", usage: 340 },
+              { team: mockTeamFeatureHeatmap.teams[1], topFeature: "Inspect", usage: 280 },
+              { team: mockTeamFeatureHeatmap.teams[2], topFeature: "Plan", usage: 240 },
+              { team: mockTeamFeatureHeatmap.teams[3], topFeature: "Inspect", usage: 190 },
             ]}
           />
         </div>
-      </Card>
+      </DrilldownCard>
     </div>
   );
 }
