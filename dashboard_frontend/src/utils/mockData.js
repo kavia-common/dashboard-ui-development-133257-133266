@@ -1,16 +1,25 @@
-export const mockTimeSeries = Array.from({ length: 12 }).map((_, i) => ({
-  label: `M${i + 1}`,
-  dau: Math.round(100 + Math.random() * 200),
-  wau: Math.round(300 + Math.random() * 300),
-  mau: Math.round(600 + Math.random() * 500),
-}));
+export const mockTimeSeries = Array.from({ length: 12 }).map((_, i) => {
+  // Attach cyclical team/dept/region so filters impact time-series widgets too
+  const teams = ["Core", "Infra", "Apps", "QA"];
+  const depts = ["Engineering", "Engineering", "Product", "Support"];
+  const regions = ["NA", "EU", "APAC", "NA"];
+  return {
+    label: `M${i + 1}`,
+    dau: Math.round(100 + Math.random() * 200),
+    wau: Math.round(300 + Math.random() * 300),
+    mau: Math.round(600 + Math.random() * 500),
+    team: teams[i % teams.length],
+    dept: depts[i % depts.length],
+    region: regions[i % regions.length],
+  };
+});
 
 export const mockModuleUsage = [
   // Include department/team so Department/Team filters affect both chart and table
-  { module: "Inspect", count: 320, dept: "Engineering", team: "Core" },
-  { module: "Plan", count: 210, dept: "Product", team: "Apps" },
-  { module: "Build", count: 450, dept: "Engineering", team: "Infra" },
-  { module: "Docs", count: 180, dept: "Support", team: "QA" },
+  { module: "Inspect", count: 320, dept: "Engineering", team: "Core", region: "NA" },
+  { module: "Plan", count: 210, dept: "Product", team: "Apps", region: "EU" },
+  { module: "Build", count: 450, dept: "Engineering", team: "Infra", region: "APAC" },
+  { module: "Docs", count: 180, dept: "Support", team: "QA", region: "NA" },
 ];
 
 export const mockDepartments = [
@@ -22,21 +31,25 @@ export const mockDepartments = [
 ];
 
 export const mockDiscoveryFunnel = [
-  { stage: "Discovered", value: 1000 },
-  { stage: "Tried", value: 700 },
-  { stage: "Adopted", value: 420 },
-  { stage: "Retained", value: 300 },
+  // Add team/region tags for filter responsiveness
+  { stage: "Discovered", value: 1000, team: "Core", region: "NA" },
+  { stage: "Tried", value: 700, team: "Infra", region: "EU" },
+  { stage: "Adopted", value: 420, team: "Apps", region: "APAC" },
+  { stage: "Retained", value: 300, team: "QA", region: "NA" },
 ];
 
 export const mockEffectiveness = {
   outcomes: [
-    { label: "Accepted", value: 55 },
-    { label: "Edited", value: 30 },
-    { label: "Discarded", value: 15 },
+    { label: "Accepted", value: 55, dept: "Engineering", team: "Core", region: "NA" },
+    { label: "Edited", value: 30, dept: "Product", team: "Apps", region: "EU" },
+    { label: "Discarded", value: 15, dept: "Engineering", team: "Infra", region: "APAC" },
   ],
   acceptanceTrend: Array.from({ length: 10 }).map((_, i) => ({
     label: `W${i + 1}`,
     rate: Math.round(50 + Math.random() * 20),
+    team: ["Core", "Infra", "Apps", "QA"][i % 4],
+    dept: ["Engineering", "Engineering", "Product", "Support"][i % 4],
+    region: ["NA", "EU", "APAC", "NA"][i % 4],
   })),
   timeSavedHours: 126,
 };
@@ -53,24 +66,27 @@ export const mockTopUsersCredits = [
 export const mockLicenseUtilization = { used: 78, total: 100 };
 
 export const mockTeamAdoption = [
-  { team: "Core", score: 88, dept: "Engineering" },
-  { team: "Infra", score: 74, dept: "Engineering" },
-  { team: "Apps", score: 67, dept: "Product" },
-  { team: "QA", score: 59, dept: "Support" },
-  { team: "Growth", score: 52, dept: "Product" },
+  { team: "Core", score: 88, dept: "Engineering", region: "NA" },
+  { team: "Infra", score: 74, dept: "Engineering", region: "APAC" },
+  { team: "Apps", score: 67, dept: "Product", region: "EU" },
+  { team: "QA", score: 59, dept: "Support", region: "NA" },
+  { team: "Growth", score: 52, dept: "Product", region: "EU" },
 ];
 
 export const mockSupportTrend = Array.from({ length: 8 }).map((_, i) => ({
   label: `W${i + 1}`,
   tickets: Math.round(20 + Math.random() * 30),
+  team: ["Core", "Infra", "Apps", "QA"][i % 4],
+  dept: ["Engineering", "Engineering", "Product", "Support"][i % 4],
+  region: ["NA", "EU", "APAC", "NA"][i % 4],
 }));
 
 export const mockTrainingFeatureAdoption = [
   // Add team/department for filterability and visible variation
-  { feature: "Inspector", percent: 72, team: "Core", dept: "Engineering" },
-  { feature: "Planner", percent: 54, team: "Apps", dept: "Product" },
-  { feature: "Builder", percent: 63, team: "Infra", dept: "Engineering" },
-  { feature: "Docs", percent: 46, team: "QA", dept: "Support" },
+  { feature: "Inspector", percent: 72, team: "Core", dept: "Engineering", region: "NA" },
+  { feature: "Planner", percent: 54, team: "Apps", dept: "Product", region: "EU" },
+  { feature: "Builder", percent: 63, team: "Infra", dept: "Engineering", region: "APAC" },
+  { feature: "Docs", percent: 46, team: "QA", dept: "Support", region: "NA" },
 ];
 
 export const mockRollout = {
@@ -78,6 +94,9 @@ export const mockRollout = {
   adoptionCurve: Array.from({ length: 10 }).map((_, i) => ({
     label: `D${i + 1}`,
     users: Math.round(20 + i * 10 + Math.random() * 10),
+    team: ["Core", "Infra", "Apps", "QA"][i % 4],
+    dept: ["Engineering", "Engineering", "Product", "Support"][i % 4],
+    region: ["NA", "EU", "APAC", "NA"][i % 4],
   })),
 };
 
@@ -96,10 +115,10 @@ export const mockGeoUsage = [
 
 export const mockFeedbackFunnel = [
   // Add department to allow filtering
-  { stage: "Started", value: 1000, dept: "Engineering" },
-  { stage: "In Progress", value: 700, dept: "Engineering" },
-  { stage: "Review", value: 480, dept: "Product" },
-  { stage: "Completed", value: 350, dept: "Support" },
+  { stage: "Started", value: 1000, dept: "Engineering", region: "NA" },
+  { stage: "In Progress", value: 700, dept: "Engineering", region: "EU" },
+  { stage: "Review", value: 480, dept: "Product", region: "APAC" },
+  { stage: "Completed", value: 350, dept: "Support", region: "NA" },
 ];
 
 export const mockAdminOnly = {
