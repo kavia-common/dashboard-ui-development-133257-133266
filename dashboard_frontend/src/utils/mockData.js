@@ -426,3 +426,62 @@ export const mockGeoCompliance = [
     genWeekly(4).map(({ label, period, _i }) => ({ region: r, usage: randomIntInclusive(80, 200), compliant: i !== 2, period, label }))
   ),
 ];
+
+/**
+ * PUBLIC_INTERFACE
+ * Per-user feature usage rows to power "Feature Usage by User".
+ */
+export const mockUserFeatureUsage = [
+  // monthly rollup
+  ...USERS.slice(0, 6).flatMap((u, ui) =>
+    FEATURES.slice(0, 4).map((f, fi) => ({
+      user: u,
+      team: cyc(TEAMS, ui + fi),
+      dept: cyc(DEPTS, ui + 1),
+      feature: f,
+      count: randomIntInclusive(10, 120),
+      period: "monthly",
+    }))
+  ),
+  // weekly slices for filter coverage
+  ...USERS.slice(0, 4).flatMap((u, ui) =>
+    FEATURES.slice(0, 3).flatMap((f, fi) =>
+      genWeekly(4).map(({ label, period, _i }) => ({
+        user: u,
+        team: cyc(TEAMS, ui + fi + _i),
+        dept: cyc(DEPTS, ui + _i),
+        feature: f,
+        count: randomIntInclusive(4, 40),
+        period,
+        label,
+      }))
+    )
+  ),
+];
+
+/**
+ * PUBLIC_INTERFACE
+ * Per-user productivity metrics: acceptance rate and estimated time saved.
+ */
+export const mockUserProductivity = USERS.slice(0, 8).map((u, i) => ({
+  user: u,
+  team: cyc(TEAMS, i),
+  dept: cyc(DEPTS, i + 1),
+  acceptanceRate: randomIntInclusive(40, 85),
+  timeSavedMin: randomIntInclusive(20, 240),
+  period: "monthly",
+}));
+
+/**
+ * PUBLIC_INTERFACE
+ * Thumbs Up/Down events to simulate quality tracking per AI response.
+ */
+export const mockQualityThumbs = Array.from({ length: 24 }).map((_, i) => ({
+  ts: new Date(Date.now() - i * 3600e3).toISOString(),
+  user: cyc(USERS, i),
+  team: cyc(TEAMS, i + 1),
+  feature: cyc(FEATURES, i + 2),
+  thumb: i % 4 === 0 ? "down" : "up",
+  note: i % 4 === 0 ? "Needs refinement" : "Helpful",
+  period: cyc(["daily", "weekly", "monthly"], i),
+}));
