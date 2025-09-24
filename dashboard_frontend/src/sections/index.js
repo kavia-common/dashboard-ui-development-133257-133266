@@ -1,5 +1,6 @@
 import React from "react";
 import { Card, BarChartLike, LineChartLike, PieChartLike, Gauge, SimpleTable, Legend, DrilldownCard, HeatmapGrid, NetworkGraph } from "../components/primitives";
+import UserLevelAdditions from "./UserLevelAdditions";
 import {
   mockTimeSeries,
   mockModuleUsage,
@@ -240,6 +241,11 @@ export function AdoptionEngagement({ rbac, filters }) {
       </Card>
 
       {!allowed && <p className="text-sm text-red-600 dark:text-red-400">Access restricted for your role.</p>}
+
+      {/* Missing Usage Dashboard points: Feature Usage by User, User Productivity, Thumbs tracking */}
+      <div className="lg:col-span-2">
+        <UserLevelAdditions filters={filters} />
+      </div>
     </div>
   );
 }
