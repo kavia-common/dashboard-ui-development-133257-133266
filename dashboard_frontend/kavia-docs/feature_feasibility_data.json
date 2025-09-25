@@ -1,0 +1,642 @@
+{
+  "schema": {
+    "Referral dashboard.users": [
+      "referral_code",
+      "referral_stats.total_referrals",
+      "referral_stats.verified_referrals",
+      "referral_stats.last_referral_date",
+      "referral_history.user_id",
+      "referral_history.user_email",
+      "referral_history.user_name",
+      "referral_history.referred_at",
+      "referral_history.verified_at",
+      "referral_history.status"
+    ],
+    "Session dashboard.session_tracking": [
+      "task_id",
+      "tenant_id",
+      "organization_name",
+      "user_id",
+      "User_name",
+      "project_id",
+      "container_id",
+      "service_type",
+      "session_start",
+      "session_end",
+      "status",
+      "total_cost",
+      "agent_costs",
+      "cost_history.timestamp",
+      "cost_history.agent_costs",
+      "cost_history.total_cost",
+      "last_updated",
+      "session_data.llm_model",
+      "session_data.session_name",
+      "session_data.description",
+      "session_data.platform",
+      "session_data.selected_repos.all_repositories",
+      "session_data.selected_repos.repositories",
+      "created_at"
+    ],
+    "API dashboard.request_tracker": [
+      "request_id",
+      "created_at",
+      "date_partition",
+      "hour_partition",
+      "tenant_id",
+      "tenant_name",
+      "user_id",
+      "user_email",
+      "username",
+      "user_role",
+      "method",
+      "endpoint",
+      "full_url",
+      "status_code",
+      "duration_ms",
+      "response_size_bytes",
+      "response_type",
+      "client_ip",
+      "user_agent",
+      "device_type",
+      "browser",
+      "country",
+      "region",
+      "auth_method",
+      "has_valid_token",
+      "project_id",
+      "resource_type",
+      "action_type",
+      "custom_headers.is_public_selected",
+      "custom_headers.selected_tenant_id",
+      "custom_headers.bypass_credit_check",
+      "query_params",
+      "tags"
+    ],
+    "Deployment dashboard.app_deployments": [
+      "app_id",
+      "app_url",
+      "artifact_path",
+      "branch_name",
+      "build_path",
+      "command",
+      "created_at",
+      "custom_domain",
+      "deployment_id",
+      "job_id",
+      "message",
+      "project_id",
+      "project_name",
+      "root_path",
+      "status",
+      "subdomain",
+      "task_id",
+      "tenant_id",
+      "tenant_name",
+      "updated_at",
+      "artifact_count",
+      "domain_status",
+      "domain_checked_at"
+    ]
+  },
+  "features": [
+    {
+      "section": "Adoption & Engagement",
+      "name": "DAU / WAU / MAU",
+      "ui_type": "line_chart_x3",
+      "ui_fields": ["label", "dau", "wau", "mau"],
+      "required_schema_fields": [
+        "API.request_tracker.user_id",
+        "API.request_tracker.created_at (or API.request_tracker.date_partition)"
+      ],
+      "feasible": true,
+      "missing_fields": [],
+      "notes": "Compute distinct users per day/week/month using user_id with created_at/date_partition. Label is derived from time window."
+    },
+    {
+      "section": "Adoption & Engagement",
+      "name": "Module Usage",
+      "ui_type": "table",
+      "ui_fields": ["module", "count"],
+      "required_schema_fields": [
+        "API.request_tracker.resource_type",
+        "API.request_tracker.created_at (or API.request_tracker.date_partition)"
+      ],
+      "feasible": true,
+      "missing_fields": [],
+      "notes": "Map module to resource_type and count requests."
+    },
+    {
+      "section": "Adoption & Engagement",
+      "name": "Department Growth Trend",
+      "ui_type": "table",
+      "ui_fields": ["dept", "growth"],
+      "required_schema_fields": [],
+      "feasible": false,
+      "missing_fields": ["dept", "growth"],
+      "notes": "No department or growth metrics in schema."
+    },
+    {
+      "section": "Adoption & Engagement",
+      "name": "Discovery Funnel",
+      "ui_type": "table",
+      "ui_fields": ["stage", "value"],
+      "required_schema_fields": [],
+      "feasible": false,
+      "missing_fields": ["stage", "value"],
+      "notes": "No discovery/adoption funnel dataset."
+    },
+    {
+      "section": "Adoption & Engagement",
+      "name": "Time Heatmap",
+      "ui_type": "heatmap",
+      "ui_fields": ["xLabels(hours)", "yLabels(days)", "values"],
+      "required_schema_fields": [
+        "API.request_tracker.date_partition",
+        "API.request_tracker.hour_partition"
+      ],
+      "feasible": true,
+      "missing_fields": [],
+      "notes": "Count requests per day x hour to form intensity grid."
+    },
+    {
+      "section": "Adoption & Engagement",
+      "name": "Active Usage Snapshot",
+      "ui_type": "table",
+      "ui_fields": ["label", "dau", "wau", "mau"],
+      "required_schema_fields": [
+        "API.request_tracker.user_id",
+        "API.request_tracker.created_at (or API.request_tracker.date_partition)"
+      ],
+      "feasible": true,
+      "missing_fields": [],
+      "notes": "Same derivation as DAU/WAU/MAU, presented in table form."
+    },
+    {
+      "section": "Effectiveness",
+      "name": "AI Outcomes",
+      "ui_type": "pie_and_table",
+      "ui_fields": ["label", "value"],
+      "required_schema_fields": [],
+      "feasible": false,
+      "missing_fields": ["outcome_label", "outcome_count"],
+      "notes": "No accepted/edited/discarded outcome fields."
+    },
+    {
+      "section": "Effectiveness",
+      "name": "Acceptance Rate Trend",
+      "ui_type": "line_and_table",
+      "ui_fields": ["label", "rate"],
+      "required_schema_fields": [],
+      "feasible": false,
+      "missing_fields": ["acceptance_rate"],
+      "notes": "No acceptance rate metrics in schema."
+    },
+    {
+      "section": "Effectiveness",
+      "name": "Time Saved",
+      "ui_type": "kpi_and_table",
+      "ui_fields": ["timeSavedHours", "Total Time Saved", "Avg Acceptance Rate", "Top Outcome"],
+      "required_schema_fields": [],
+      "feasible": false,
+      "missing_fields": ["time_saved_hours", "acceptance_rate", "outcome_summary"],
+      "notes": "No time-saved fields."
+    },
+    {
+      "section": "Effectiveness",
+      "name": "Before vs After (Workflow Time)",
+      "ui_type": "table",
+      "ui_fields": ["workflow", "beforeMin", "afterMin", "saved"],
+      "required_schema_fields": [],
+      "feasible": false,
+      "missing_fields": ["workflow", "before_minutes", "after_minutes"],
+      "notes": "No workflow timing dataset."
+    },
+    {
+      "section": "Effectiveness",
+      "name": "Workflow Funnels by Team",
+      "ui_type": "table",
+      "ui_fields": ["team", "start", "stage1", "stage2", "done"],
+      "required_schema_fields": [],
+      "feasible": false,
+      "missing_fields": ["team", "funnel_stage_counts"],
+      "notes": "No team dimension or workflow stages."
+    },
+    {
+      "section": "Training & Awareness",
+      "name": "Feature Adoption %",
+      "ui_type": "bars_and_table",
+      "ui_fields": ["feature", "percent"],
+      "required_schema_fields": [],
+      "feasible": false,
+      "missing_fields": ["feature_dimension", "adoption_percent"],
+      "notes": "No feature adoption fields (resource_type could partially approximate feature but adoption % definition is absent)."
+    },
+    {
+      "section": "Training & Awareness",
+      "name": "Support Trends",
+      "ui_type": "table",
+      "ui_fields": ["label", "tickets"],
+      "required_schema_fields": [],
+      "feasible": false,
+      "missing_fields": ["ticket_count"],
+      "notes": "No support ticket dataset."
+    },
+    {
+      "section": "Training & Awareness",
+      "name": "Onboarding Progress",
+      "ui_type": "bars_and_table",
+      "ui_fields": ["user", "team", "milestone", "progress"],
+      "required_schema_fields": [],
+      "feasible": false,
+      "missing_fields": ["onboarding_milestones", "progress", "team"],
+      "notes": "No onboarding fields."
+    },
+    {
+      "section": "Training & Awareness",
+      "name": "Cohort Retention",
+      "ui_type": "table_and_lines",
+      "ui_fields": ["cohort", "d0", "d7", "d14", "d30"],
+      "required_schema_fields": [],
+      "feasible": false,
+      "missing_fields": ["cohort_id", "retention_metrics"],
+      "notes": "No cohort dataset."
+    },
+    {
+      "section": "Organizational Metrics",
+      "name": "License Utilization",
+      "ui_type": "gauge_and_table",
+      "ui_fields": ["metric", "value"],
+      "required_schema_fields": [],
+      "feasible": false,
+      "missing_fields": ["license_used", "license_total"],
+      "notes": "No license/seat data."
+    },
+    {
+      "section": "Organizational Metrics",
+      "name": "Collaboration Network",
+      "ui_type": "network_and_table",
+      "ui_fields": ["nodes", "links"],
+      "required_schema_fields": [],
+      "feasible": false,
+      "missing_fields": ["collaboration_nodes", "collaboration_edges"],
+      "notes": "No collaboration graph dataset."
+    },
+    {
+      "section": "Organizational Metrics",
+      "name": "Team-Feature Heatmap",
+      "ui_type": "heatmap",
+      "ui_fields": ["teams", "features", "values"],
+      "required_schema_fields": [],
+      "feasible": false,
+      "missing_fields": ["team", "feature", "usage_matrix"],
+      "notes": "Team/feature matrix not present."
+    },
+    {
+      "section": "Feedback & Problem Detection",
+      "name": "Workflow Drop-off Funnel",
+      "ui_type": "table",
+      "ui_fields": ["stage", "value"],
+      "required_schema_fields": [],
+      "feasible": false,
+      "missing_fields": ["workflow_stages"],
+      "notes": "No workflow stages dataset."
+    },
+    {
+      "section": "Feedback & Problem Detection",
+      "name": "Support Metrics",
+      "ui_type": "line_and_table",
+      "ui_fields": ["label", "team", "tickets", "sla"],
+      "required_schema_fields": [],
+      "feasible": false,
+      "missing_fields": ["team", "ticket_count", "sla"],
+      "notes": "No ticket/SLA fields."
+    },
+    {
+      "section": "Feedback & Problem Detection",
+      "name": "Feedback Sentiment & Categories",
+      "ui_type": "table",
+      "ui_fields": ["id", "team", "category", "sentiment", "score"],
+      "required_schema_fields": [],
+      "feasible": false,
+      "missing_fields": ["sentiment", "category", "score", "team"],
+      "notes": "No sentiment feedback dataset."
+    },
+    {
+      "section": "Feedback & Problem Detection",
+      "name": "Resolution Times",
+      "ui_type": "table",
+      "ui_fields": ["category", "medianH", "p90H"],
+      "required_schema_fields": [],
+      "feasible": false,
+      "missing_fields": ["resolution_time_metrics"],
+      "notes": "No resolution time dataset."
+    },
+    {
+      "section": "Feedback & Problem Detection",
+      "name": "Error Logs",
+      "ui_type": "table",
+      "ui_fields": ["ts", "level", "component", "message"],
+      "required_schema_fields": [
+        "API.request_tracker.created_at",
+        "API.request_tracker.status_code",
+        "API.request_tracker.endpoint (or API.request_tracker.resource_type)",
+        "API.request_tracker.response_type (or API.request_tracker.full_url)"
+      ],
+      "feasible": true,
+      "missing_fields": [],
+      "notes": "Derive level from status_code (e.g., 5xx=ERROR, 4xx=WARN). Component from endpoint/resource_type."
+    },
+    {
+      "section": "Feedback & Problem Detection",
+      "name": "Audit Trail",
+      "ui_type": "table",
+      "ui_fields": ["ts", "user", "action", "detail"],
+      "required_schema_fields": [
+        "API.request_tracker.created_at (as ts)",
+        "API.request_tracker.username (or API.request_tracker.user_id)",
+        "API.request_tracker.action_type",
+        "API.request_tracker.endpoint (or API.request_tracker.full_url)"
+      ],
+      "feasible": true,
+      "missing_fields": [],
+      "notes": "Action maps to action_type; detail can be endpoint/full_url."
+    },
+    {
+      "section": "Team Analytics",
+      "name": "Team Adoption Score",
+      "ui_type": "bars_and_table",
+      "ui_fields": ["team", "score"],
+      "required_schema_fields": [],
+      "feasible": false,
+      "missing_fields": ["team", "adoption_score"],
+      "notes": "Team dimension not present."
+    },
+    {
+      "section": "Team Analytics",
+      "name": "Feature-Team Heatmap",
+      "ui_type": "heatmap_and_table",
+      "ui_fields": ["team", "topFeature", "usage"],
+      "required_schema_fields": [],
+      "feasible": false,
+      "missing_fields": ["team", "feature", "usage"],
+      "notes": "Team and feature matrix not present."
+    },
+    {
+      "section": "Usage Patterns",
+      "name": "Usage by Hour",
+      "ui_type": "table",
+      "ui_fields": ["hour", "team", "count"],
+      "required_schema_fields": [
+        "API.request_tracker.hour_partition",
+        "API.request_tracker.date_partition"
+      ],
+      "feasible": false,
+      "missing_fields": ["team"],
+      "notes": "Hour/count available; team is not present in schema."
+    },
+    {
+      "section": "Usage Patterns",
+      "name": "Geographic Usage",
+      "ui_type": "table",
+      "ui_fields": ["region", "dept", "team", "count"],
+      "required_schema_fields": [
+        "API.request_tracker.region (or API.request_tracker.country)"
+      ],
+      "feasible": false,
+      "missing_fields": ["dept", "team"],
+      "notes": "Region available; department/team not present."
+    },
+    {
+      "section": "Usage Patterns",
+      "name": "Geo Compliance",
+      "ui_type": "pie_and_table",
+      "ui_fields": ["region", "usage", "compliant"],
+      "required_schema_fields": [
+        "API.request_tracker.region (or API.request_tracker.country)"
+      ],
+      "feasible": false,
+      "missing_fields": ["compliant_flag_or_metric"],
+      "notes": "No compliance field by region."
+    },
+    {
+      "section": "Feature Flag & Rollout Tracking",
+      "name": "Rollout Progress",
+      "ui_type": "gauge_and_table",
+      "ui_fields": ["progress", "days_elapsed"],
+      "required_schema_fields": [],
+      "feasible": false,
+      "missing_fields": ["rollout_progress", "days_elapsed"],
+      "notes": "No feature-flag/rollout data."
+    },
+    {
+      "section": "Feature Flag & Rollout Tracking",
+      "name": "Adoption Curve",
+      "ui_type": "line_and_table",
+      "ui_fields": ["label", "users"],
+      "required_schema_fields": [],
+      "feasible": false,
+      "missing_fields": ["rollout_user_counts_over_time"],
+      "notes": "General adoption could be computed, but rollout-specific series is not present."
+    },
+    {
+      "section": "Cost & Credits",
+      "name": "Credit Utilization",
+      "ui_type": "gauge_and_table",
+      "ui_fields": ["metric", "value"],
+      "required_schema_fields": [],
+      "feasible": false,
+      "missing_fields": ["credits_used", "credits_limit", "utilization"],
+      "notes": "Only session total_cost exists; no credits/limits."
+    },
+    {
+      "section": "Cost & Credits",
+      "name": "Top Users by Credits",
+      "ui_type": "table",
+      "ui_fields": ["user", "team", "used", "balance", "cost"],
+      "required_schema_fields": [],
+      "feasible": false,
+      "missing_fields": ["credits_used", "credit_balance", "team", "cost_per_user_binding"],
+      "notes": "Credits not present; cost could be approximated from session total_cost per user, but not credits/balance."
+    },
+    {
+      "section": "Cost & Credits",
+      "name": "Cost-per-Usage Analytics",
+      "ui_type": "table",
+      "ui_fields": ["entity", "period", "consumed", "cost", "efficiency"],
+      "required_schema_fields": [],
+      "feasible": false,
+      "missing_fields": ["consumed_units", "entity_mapping", "efficiency_metric"],
+      "notes": "No mapping of costs to product entities in schema."
+    },
+    {
+      "section": "Cost & Credits",
+      "name": "Allocations & Limits",
+      "ui_type": "table",
+      "ui_fields": ["entity", "credits", "limit", "util (%)", "cost"],
+      "required_schema_fields": [],
+      "feasible": false,
+      "missing_fields": ["allocations", "limits", "credits", "entity_mapping"],
+      "notes": "No allocations/limits dataset."
+    },
+    {
+      "section": "Kavia-Admin Only",
+      "name": "ROI by Department",
+      "ui_type": "table",
+      "ui_fields": ["dept", "roi (%)"],
+      "required_schema_fields": [],
+      "feasible": false,
+      "missing_fields": ["dept", "roi"],
+      "notes": "No department/ROI metrics."
+    },
+    {
+      "section": "Kavia-Admin Only",
+      "name": "Latency (p95)",
+      "ui_type": "line_and_table",
+      "ui_fields": ["label", "p95"],
+      "required_schema_fields": [
+        "API.request_tracker.duration_ms",
+        "API.request_tracker.created_at (or API.request_tracker.date_partition)"
+      ],
+      "feasible": true,
+      "missing_fields": [],
+      "notes": "Compute p95 latency per period."
+    },
+    {
+      "section": "Kavia-Admin Only",
+      "name": "Churn Risk",
+      "ui_type": "table",
+      "ui_fields": ["team", "risk", "alert"],
+      "required_schema_fields": [],
+      "feasible": false,
+      "missing_fields": ["team", "churn_risk_score", "alert_flag"],
+      "notes": "No churn risk model outputs."
+    },
+    {
+      "section": "Kavia-Admin Only",
+      "name": "Benchmarking",
+      "ui_type": "table",
+      "ui_fields": ["metric", "tenant", "peers"],
+      "required_schema_fields": [],
+      "feasible": false,
+      "missing_fields": ["benchmark_metrics", "peers"],
+      "notes": "No peer/benchmark dataset."
+    },
+    {
+      "section": "Kavia-Admin Only",
+      "name": "Capacity & Predictive Analytics",
+      "ui_type": "line_charts_x2",
+      "ui_fields": ["label", "series_y1", "series_y2"],
+      "required_schema_fields": [],
+      "feasible": false,
+      "missing_fields": ["capacity_metrics", "forecast_series"],
+      "notes": "No capacity/forecast fields."
+    },
+    {
+      "section": "Kavia-Admin Only",
+      "name": "Integration Health",
+      "ui_type": "table",
+      "ui_fields": ["integration", "status", "errors (24h)"],
+      "required_schema_fields": [],
+      "feasible": false,
+      "missing_fields": ["integration_name", "integration_status", "errors_last_24h"],
+      "notes": "No integration health dataset."
+    },
+    {
+      "section": "Kavia-Admin Only",
+      "name": "Compliance & Security",
+      "ui_type": "table",
+      "ui_fields": ["control", "status", "notes"],
+      "required_schema_fields": [],
+      "feasible": false,
+      "missing_fields": ["control", "status", "notes"],
+      "notes": "No compliance controls dataset."
+    },
+    {
+      "section": "User-Level Additions",
+      "name": "Feature Usage by User",
+      "ui_type": "table",
+      "ui_fields": ["user", "team", "feature", "count"],
+      "required_schema_fields": [
+        "API.request_tracker.user_id",
+        "API.request_tracker.resource_type"
+      ],
+      "feasible": false,
+      "missing_fields": ["team", "product_feature_dimension"],
+      "notes": "Feature could be approximated by resource_type; team not present."
+    },
+    {
+      "section": "User-Level Additions",
+      "name": "User Productivity Metrics",
+      "ui_type": "table_line_pie",
+      "ui_fields": ["user", "team", "acceptanceRate", "timeSavedMin", "effScore"],
+      "required_schema_fields": [
+        "Session.session_tracking.user_id (for identity only)"
+      ],
+      "feasible": false,
+      "missing_fields": ["acceptance_rate", "time_saved_min", "efficiency_score", "team"],
+      "notes": "No productivity metrics in schema."
+    },
+    {
+      "section": "User-Level Additions",
+      "name": "Quality Tracking (Thumbs)",
+      "ui_type": "kpis_and_table",
+      "ui_fields": ["ts", "user", "team", "feature", "thumb", "note"],
+      "required_schema_fields": [],
+      "feasible": false,
+      "missing_fields": ["thumb_vote", "note", "team", "feature"],
+      "notes": "No thumbs/quality feedback fields."
+    }
+  ],
+  "classification": {
+    "feasible_features": [
+      "DAU / WAU / MAU",
+      "Module Usage",
+      "Time Heatmap",
+      "Active Usage Snapshot",
+      "Error Logs",
+      "Audit Trail",
+      "Latency (p95)"
+    ],
+    "non_feasible_features": [
+      "Department Growth Trend",
+      "Discovery Funnel",
+      "AI Outcomes",
+      "Acceptance Rate Trend",
+      "Time Saved",
+      "Before vs After (Workflow Time)",
+      "Workflow Funnels by Team",
+      "Feature Adoption %",
+      "Support Trends",
+      "Onboarding Progress",
+      "Cohort Retention",
+      "License Utilization",
+      "Collaboration Network",
+      "Team-Feature Heatmap",
+      "Workflow Drop-off Funnel",
+      "Support Metrics",
+      "Feedback Sentiment & Categories",
+      "Resolution Times",
+      "Usage by Hour",
+      "Geographic Usage",
+      "Geo Compliance",
+      "Rollout Progress",
+      "Adoption Curve",
+      "Credit Utilization",
+      "Top Users by Credits",
+      "Cost-per-Usage Analytics",
+      "Allocations & Limits",
+      "ROI by Department",
+      "Churn Risk",
+      "Benchmarking",
+      "Capacity & Predictive Analytics",
+      "Integration Health",
+      "Compliance & Security",
+      "Team Adoption Score",
+      "Feature-Team Heatmap",
+      "Feature Usage by User",
+      "User Productivity Metrics",
+      "Quality Tracking (Thumbs)"
+    ]
+  }
+}
