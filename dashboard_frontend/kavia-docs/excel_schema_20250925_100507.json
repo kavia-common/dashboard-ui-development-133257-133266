@@ -1,0 +1,599 @@
+{
+  "sheets": [
+    "Sheet1"
+  ],
+  "dashboards": {
+    "Referral dashboard": {
+      "users": [
+        {
+          "path": "referral_code",
+          "name": "referral_code",
+          "type": "string",
+          "description": "Used to onboard users through referrals."
+        },
+        {
+          "path": "referral_stats",
+          "name": "referral_stats",
+          "type": "array<object>",
+          "description": "List of objects containing referral statistics."
+        },
+        {
+          "path": "referral_stats.total_referrals",
+          "name": "total_referrals",
+          "type": "integer",
+          "description": "Number of users onboarded based on the referral code"
+        },
+        {
+          "path": "referral_stats.verified_referrals",
+          "name": "verified_referrals",
+          "type": "integer",
+          "description": "Number of users who have been verified."
+        },
+        {
+          "path": "referral_stats.last_referral_date",
+          "name": "last_referral_date",
+          "type": "date",
+          "description": "The most recent date a referral occurred."
+        },
+        {
+          "path": "referral_history",
+          "name": "referral_history",
+          "type": "array<object>",
+          "description": "List of referral history objects containing detailed referral data."
+        },
+        {
+          "path": "referral_history.user_id",
+          "name": "user_id",
+          "type": "string",
+          "description": "Unique identifier of the referred user."
+        },
+        {
+          "path": "referral_history.user_email",
+          "name": "user_email",
+          "type": "string",
+          "description": "Email address of the referred user."
+        },
+        {
+          "path": "referral_history.user_name",
+          "name": "user_name",
+          "type": "string",
+          "description": "Name of the referred user."
+        },
+        {
+          "path": "referral_history.referred_at",
+          "name": "referred_at",
+          "type": "datetime",
+          "description": "Timestamp when the referral occurred."
+        },
+        {
+          "path": "referral_history.verified_at",
+          "name": "verified_at",
+          "type": "datetime",
+          "description": "Timestamp when the referral was verified."
+        },
+        {
+          "path": "referral_history.status",
+          "name": "status",
+          "type": "string",
+          "description": "Status of the referral (e.g., pending, verified)"
+        }
+      ]
+    },
+    "Session dashboard": {
+      "session_tracking": [
+        {
+          "path": "task_id",
+          "name": "task_id",
+          "type": "string",
+          "description": "Has the value of the particular task which is present."
+        },
+        {
+          "path": "tenant_id",
+          "name": "tenant_id",
+          "type": "string",
+          "description": "The organization this session belongs to."
+        },
+        {
+          "path": "organization_name",
+          "name": "organization_name",
+          "type": "string",
+          "description": "Name of the organization."
+        },
+        {
+          "path": "user_id",
+          "name": "user_id",
+          "type": "string",
+          "description": "Unique identifier of the user."
+        },
+        {
+          "path": "User_name",
+          "name": "User_name",
+          "type": "string",
+          "description": "Name of the user who performs the session"
+        },
+        {
+          "path": "project_id",
+          "name": "project_id",
+          "type": "string",
+          "description": "The project ID associated with the session."
+        },
+        {
+          "path": "container_id",
+          "name": "container_id",
+          "type": "string",
+          "description": "Value indicating if the session belongs to code generation or code maintenance."
+        },
+        {
+          "path": "service_type",
+          "name": "service_type",
+          "type": "string",
+          "description": "Type of service, e.g., code generation, code query, deep query, interactive configuration, auto configuration, or code maintenance."
+        },
+        {
+          "path": "session_start",
+          "name": "session_start",
+          "type": "datetime",
+          "description": "Timestamp when the session started."
+        },
+        {
+          "path": "session_end",
+          "name": "session_end",
+          "type": "datetime",
+          "description": "Timestamp when the session ended."
+        },
+        {
+          "path": "status",
+          "name": "status",
+          "type": "string",
+          "description": "Status of the session (active, completed, failed)."
+        },
+        {
+          "path": "total_cost",
+          "name": "total_cost",
+          "type": "number",
+          "description": "Sum of all agent costs."
+        },
+        {
+          "path": "agent_costs",
+          "name": "agent_costs",
+          "type": "object",
+          "description": "Object containing a list of agents and their respective costs"
+        },
+        {
+          "path": "cost_history",
+          "name": "cost_history",
+          "type": "array<object>",
+          "description": "Array of objects representing various agent costs and total costs for particular durations."
+        },
+        {
+          "path": "cost_history.timestamp",
+          "name": "timestamp",
+          "type": "datetime",
+          "description": "Timestamp for this cost entry."
+        },
+        {
+          "path": "cost_history.agent_costs",
+          "name": "agent_costs",
+          "type": "object",
+          "description": "Costs for each agent at this timestamp."
+        },
+        {
+          "path": "cost_history.total_cost",
+          "name": "total_cost",
+          "type": "number",
+          "description": "Total cost for this timestamp."
+        },
+        {
+          "path": "last_updated",
+          "name": "last_updated",
+          "type": "datetime",
+          "description": "Timestamp of the last update for this session."
+        },
+        {
+          "path": "session_data",
+          "name": "session_data",
+          "type": "object",
+          "description": "Object containing session-specific data."
+        },
+        {
+          "path": "session_data.llm_model",
+          "name": "llm_model",
+          "type": "string",
+          "description": "Name of the LLM model currently used in this session."
+        },
+        {
+          "path": "session_data.session_name",
+          "name": "session_name",
+          "type": "string",
+          "description": "Name of the particular session"
+        },
+        {
+          "path": "session_data.description",
+          "name": "description",
+          "type": "string",
+          "description": "Description for the particular session"
+        },
+        {
+          "path": "session_data.platform",
+          "name": "platform",
+          "type": "string",
+          "description": "which platform is been used to perform the operation for ex : web"
+        },
+        {
+          "path": "session_data.selected_repos",
+          "name": "selected_repos",
+          "type": "object",
+          "description": "object containing the list of repositories used in code maintenance"
+        },
+        {
+          "path": "session_data.selected_repos.all_repositories",
+          "name": "all_repositories",
+          "type": "boolean",
+          "description": "Boolean: true if all repositories are selected, false if specific repositories are selected"
+        },
+        {
+          "path": "session_data.selected_repos.repositories",
+          "name": "repositories",
+          "type": "array<string>",
+          "description": "Array containing IDs of selected repositories if all_repositories is false."
+        },
+        {
+          "path": "created_at",
+          "name": "created_at",
+          "type": "datetime",
+          "description": "Timestamp when the session was created."
+        }
+      ]
+    },
+    "API dashboard": {
+      "request_tracker": [
+        {
+          "path": "request_id",
+          "name": "request_id",
+          "type": "string",
+          "description": "Unique identifier for the API request."
+        },
+        {
+          "path": "created_at",
+          "name": "created_at",
+          "type": "datetime",
+          "description": "Timestamp when the request was created."
+        },
+        {
+          "path": "date_partition",
+          "name": "date_partition",
+          "type": "date",
+          "description": "Extracts the date (YYYY-MM-DD) from a datetime to organize or segment data by day."
+        },
+        {
+          "path": "hour_partition",
+          "name": "hour_partition",
+          "type": "integer",
+          "description": "Extracts the hour (0–23) from a datetime to organize or segment data by hour."
+        },
+        {
+          "path": "tenant_id",
+          "name": "tenant_id",
+          "type": "string",
+          "description": "Organization ID."
+        },
+        {
+          "path": "tenant_name",
+          "name": "tenant_name",
+          "type": "string",
+          "description": "Name of the organization"
+        },
+        {
+          "path": "user_id",
+          "name": "user_id",
+          "type": "string",
+          "description": "Unique identifier of the user making the request."
+        },
+        {
+          "path": "user_email",
+          "name": "user_email",
+          "type": "string",
+          "description": "Email of the user."
+        },
+        {
+          "path": "username",
+          "name": "username",
+          "type": "string",
+          "description": "Name of the user."
+        },
+        {
+          "path": "user_role",
+          "name": "user_role",
+          "type": "string",
+          "description": "Role of the user (e.g., admin or user)."
+        },
+        {
+          "path": "method",
+          "name": "method",
+          "type": "string",
+          "description": "HTTP method used (e.g., GET)."
+        },
+        {
+          "path": "endpoint",
+          "name": "endpoint",
+          "type": "string",
+          "description": "API endpoint called."
+        },
+        {
+          "path": "full_url",
+          "name": "full_url",
+          "type": "string",
+          "description": "Complete URL of the request."
+        },
+        {
+          "path": "status_code",
+          "name": "status_code",
+          "type": "integer",
+          "description": "HTTP response status code."
+        },
+        {
+          "path": "duration_ms",
+          "name": "duration_ms",
+          "type": "integer",
+          "description": "Duration of the request in milliseconds."
+        },
+        {
+          "path": "response_size_bytes",
+          "name": "response_size_bytes",
+          "type": "integer",
+          "description": "Content-Length from response headers, defaulting to 0 if missing."
+        },
+        {
+          "path": "response_type",
+          "name": "response_type",
+          "type": "string",
+          "description": "Type of response returned (e.g., success)."
+        },
+        {
+          "path": "client_ip",
+          "name": "client_ip",
+          "type": "string",
+          "description": "IP address of the client"
+        },
+        {
+          "path": "user_agent",
+          "name": "user_agent",
+          "type": "string",
+          "description": "Browser or client user agent string."
+        },
+        {
+          "path": "device_type",
+          "name": "device_type",
+          "type": "string",
+          "description": "Device type (e.g., desktop)."
+        },
+        {
+          "path": "browser",
+          "name": "browser",
+          "type": "string",
+          "description": "Browser name (e.g., Chrome)."
+        },
+        {
+          "path": "country",
+          "name": "country",
+          "type": "string",
+          "description": "Country of the client."
+        },
+        {
+          "path": "region",
+          "name": "region",
+          "type": "string",
+          "description": "Region of the client."
+        },
+        {
+          "path": "auth_method",
+          "name": "auth_method",
+          "type": "string",
+          "description": "Authentication method (e.g., Bearer)."
+        },
+        {
+          "path": "has_valid_token",
+          "name": "has_valid_token",
+          "type": "boolean",
+          "description": "Boolean: true if the token is valid, false otherwise."
+        },
+        {
+          "path": "project_id",
+          "name": "project_id",
+          "type": "string",
+          "description": "ID of the project related to the request."
+        },
+        {
+          "path": "resource_type",
+          "name": "resource_type",
+          "type": "string",
+          "description": "Type of resource (e.g., users, projects, tasks)."
+        },
+        {
+          "path": "action_type",
+          "name": "action_type",
+          "type": "string",
+          "description": "Determine the action type based on HTTP method and path"
+        },
+        {
+          "path": "custom_headers",
+          "name": "custom_headers",
+          "type": "object",
+          "description": "Object containing custom header values."
+        },
+        {
+          "path": "custom_headers.is_public_selected",
+          "name": "is_public_selected",
+          "type": "boolean",
+          "description": "Boolean: public or private project."
+        },
+        {
+          "path": "custom_headers.selected_tenant_id",
+          "name": "selected_tenant_id",
+          "type": "string",
+          "description": "Organization ID from the header."
+        },
+        {
+          "path": "custom_headers.bypass_credit_check",
+          "name": "bypass_credit_check",
+          "type": "string",
+          "description": "Value from \"Bypass-Credit-Check\" header, default empty string if not present"
+        },
+        {
+          "path": "query_params",
+          "name": "query_params",
+          "type": "object",
+          "description": "Object containing all query parameter keys and their values."
+        },
+        {
+          "path": "tags",
+          "name": "tags",
+          "type": "array<string>",
+          "description": "Array of tags categorizing requests by method, response status, resource type, and user role."
+        }
+      ]
+    },
+    "Deployment dashboard": {
+      "app_deployments": [
+        {
+          "path": "app_id",
+          "name": "app_id",
+          "type": "string",
+          "description": "Unique identifier for the deployed application."
+        },
+        {
+          "path": "app_url",
+          "name": "app_url",
+          "type": "string",
+          "description": "Publicly accessible URL of the deployed application"
+        },
+        {
+          "path": "artifact_path",
+          "name": "artifact_path",
+          "type": "string",
+          "description": "Storage path or location of the deployment artifacts (e.g., build files, images)."
+        },
+        {
+          "path": "branch_name",
+          "name": "branch_name",
+          "type": "string",
+          "description": "The Git branch from which the deployment was created."
+        },
+        {
+          "path": "build_path",
+          "name": "build_path",
+          "type": "string",
+          "description": "Path to the build directory containing compiled application files."
+        },
+        {
+          "path": "command",
+          "name": "command",
+          "type": "string",
+          "description": "Build command executed for deployment (e.g., npm run build)."
+        },
+        {
+          "path": "created_at",
+          "name": "created_at",
+          "type": "datetime",
+          "description": "Timestamp when the deployment was created."
+        },
+        {
+          "path": "custom_domain",
+          "name": "custom_domain",
+          "type": "string",
+          "description": "Custom domain mapped to the deployed application, if configured."
+        },
+        {
+          "path": "deployment_id",
+          "name": "deployment_id",
+          "type": "string",
+          "description": "Unique identifier for the deployment instance."
+        },
+        {
+          "path": "job_id",
+          "name": "job_id",
+          "type": "string",
+          "description": "Identifier of the deployment job or process execution."
+        },
+        {
+          "path": "message",
+          "name": "message",
+          "type": "string",
+          "description": "Additional message or notes related to the deployment"
+        },
+        {
+          "path": "project_id",
+          "name": "project_id",
+          "type": "string",
+          "description": "project id associated with the deployment."
+        },
+        {
+          "path": "project_name",
+          "name": "project_name",
+          "type": "string",
+          "description": "Name of the project associated with the deployment."
+        },
+        {
+          "path": "root_path",
+          "name": "root_path",
+          "type": "string",
+          "description": "Root directory path from which the deployment files are served."
+        },
+        {
+          "path": "status",
+          "name": "status",
+          "type": "string",
+          "description": "Current status of the deployment (e.g., success, failed, in-progress)."
+        },
+        {
+          "path": "subdomain",
+          "name": "subdomain",
+          "type": "string",
+          "description": "Auto-generated subdomain assigned to the deployment."
+        },
+        {
+          "path": "task_id",
+          "name": "task_id",
+          "type": "string",
+          "description": "Particular task where the deployment happend for the project"
+        },
+        {
+          "path": "tenant_id",
+          "name": "tenant_id",
+          "type": "string",
+          "description": "Organization id associated with the deployment."
+        },
+        {
+          "path": "tenant_name",
+          "name": "tenant_name",
+          "type": "string",
+          "description": "Organization name associated with the deployment."
+        },
+        {
+          "path": "updated_at",
+          "name": "updated_at",
+          "type": "datetime",
+          "description": "Timestamp of the most recent update to the deployment."
+        },
+        {
+          "path": "artifact_count",
+          "name": "artifact_count",
+          "type": "integer",
+          "description": "Number of artifacts generated or uploaded during deployment."
+        },
+        {
+          "path": "domain_status",
+          "name": "domain_status",
+          "type": "string",
+          "description": "Status of the custom domain (e.g., verified, pending, failed)."
+        },
+        {
+          "path": "domain_checked_at",
+          "name": "domain_checked_at",
+          "type": "datetime",
+          "description": "Timestamp when the custom domain was last verified or checked."
+        }
+      ]
+    }
+  }
+}
