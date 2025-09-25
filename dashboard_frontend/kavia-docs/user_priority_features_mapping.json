@@ -1,0 +1,421 @@
+{
+  "generated_for_schema": "dashboard_frontend/kavia-docs/excel_schema_20250925_100507.json",
+  "source_excel": "attachments/20250925_100507_Dashboard_Data_Fields.xlsx",
+  "features": [
+    {
+      "priority": "CRITICAL",
+      "feature": "User-Tenant Mapping",
+      "description": "Map individual users to tenant with credit/cost consumption per project",
+      "required_fields": [
+        {
+          "field": "user_id",
+          "required": true,
+          "purpose": "Identify individual users"
+        },
+        {
+          "field": "user_display_name",
+          "aliases": ["User_name", "username", "user_email"],
+          "required": true,
+          "purpose": "Display name for user in UI"
+        },
+        {
+          "field": "tenant_id",
+          "required": true,
+          "purpose": "Map user to tenant/org"
+        },
+        {
+          "field": "tenant_name",
+          "aliases": ["organization_name"],
+          "required": true,
+          "purpose": "Display org name"
+        },
+        {
+          "field": "project_id",
+          "required": true,
+          "purpose": "Attribute consumption to projects"
+        },
+        {
+          "field": "project_name",
+          "required": false,
+          "purpose": "Human-friendly project label when available"
+        },
+        {
+          "field": "cost_total_per_project",
+          "required": true,
+          "derived_from": ["Session dashboard.session_tracking.total_cost"],
+          "purpose": "Show cost consumption per project"
+        },
+        {
+          "field": "credits_used_per_project",
+          "required": true,
+          "purpose": "Show credit consumption per project"
+        }
+      ],
+      "schema_field_matches": [
+        {
+          "required_field": "user_id",
+          "schema_paths": [
+            "Session dashboard.session_tracking.user_id",
+            "API dashboard.request_tracker.user_id"
+          ],
+          "status": "present"
+        },
+        {
+          "required_field": "user_display_name",
+          "schema_paths": [
+            "Session dashboard.session_tracking.User_name",
+            "API dashboard.request_tracker.username",
+            "API dashboard.request_tracker.user_email"
+          ],
+          "status": "present"
+        },
+        {
+          "required_field": "tenant_id",
+          "schema_paths": [
+            "Session dashboard.session_tracking.tenant_id",
+            "API dashboard.request_tracker.tenant_id"
+          ],
+          "status": "present"
+        },
+        {
+          "required_field": "tenant_name",
+          "schema_paths": [
+            "API dashboard.request_tracker.tenant_name",
+            "Session dashboard.session_tracking.organization_name"
+          ],
+          "status": "present"
+        },
+        {
+          "required_field": "project_id",
+          "schema_paths": [
+            "Session dashboard.session_tracking.project_id",
+            "API dashboard.request_tracker.project_id"
+          ],
+          "status": "present"
+        },
+        {
+          "required_field": "project_name",
+          "schema_paths": [
+            "Deployment dashboard.app_deployments.project_name"
+          ],
+          "status": "present_optional"
+        },
+        {
+          "required_field": "cost_total_per_project",
+          "schema_paths": [
+            "Session dashboard.session_tracking.total_cost",
+            "Session dashboard.session_tracking.cost_history.total_cost"
+          ],
+          "status": "present (derived via aggregation)"
+        },
+        {
+          "required_field": "credits_used_per_project",
+          "schema_paths": [],
+          "status": "missing"
+        }
+      ],
+      "missing_fields": [
+        "credits_used_per_project"
+      ],
+      "feasible": false,
+      "feasibility_reason": "Credits data are not present in the schema. Costs can be aggregated from session_tracking, but credit consumption per project is unavailable."
+    },
+    {
+      "priority": "CRITICAL",
+      "feature": "Session Management",
+      "description": "Track time spent in sessions and projects by each user",
+      "required_fields": [
+        {
+          "field": "user_id",
+          "required": true,
+          "purpose": "Group sessions by user"
+        },
+        {
+          "field": "project_id",
+          "required": true,
+          "purpose": "Attribute session time to project"
+        },
+        {
+          "field": "session_start",
+          "required": true,
+          "purpose": "Compute session duration"
+        },
+        {
+          "field": "session_end",
+          "required": true,
+          "purpose": "Compute session duration"
+        },
+        {
+          "field": "status",
+          "required": false,
+          "purpose": "Filter active/completed sessions"
+        }
+      ],
+      "schema_field_matches": [
+        {
+          "required_field": "user_id",
+          "schema_paths": [
+            "Session dashboard.session_tracking.user_id"
+          ],
+          "status": "present"
+        },
+        {
+          "required_field": "project_id",
+          "schema_paths": [
+            "Session dashboard.session_tracking.project_id"
+          ],
+          "status": "present"
+        },
+        {
+          "required_field": "session_start",
+          "schema_paths": [
+            "Session dashboard.session_tracking.session_start"
+          ],
+          "status": "present"
+        },
+        {
+          "required_field": "session_end",
+          "schema_paths": [
+            "Session dashboard.session_tracking.session_end"
+          ],
+          "status": "present"
+        },
+        {
+          "required_field": "status",
+          "schema_paths": [
+            "Session dashboard.session_tracking.status"
+          ],
+          "status": "present_optional"
+        }
+      ],
+      "missing_fields": [],
+      "feasible": true,
+      "feasibility_reason": "All fields required to compute per-user per-project session time are present in session_tracking."
+    },
+    {
+      "priority": "HIGH",
+      "feature": "User Navigation",
+      "description": "Enable tenants to navigate through n number of users with grouping",
+      "required_fields": [
+        {
+          "field": "tenant_id",
+          "required": true,
+          "purpose": "Filter users by tenant"
+        },
+        {
+          "field": "tenant_name",
+          "required": false,
+          "purpose": "Display org label"
+        },
+        {
+          "field": "user_id",
+          "required": true,
+          "purpose": "Identify user"
+        },
+        {
+          "field": "username",
+          "required": false,
+          "purpose": "Display name"
+        },
+        {
+          "field": "grouping_dimension",
+          "required": true,
+          "acceptable_sources": [
+            "user_role",
+            "service_type",
+            "resource_type"
+          ],
+          "purpose": "Group users for navigation"
+        }
+      ],
+      "schema_field_matches": [
+        {
+          "required_field": "tenant_id",
+          "schema_paths": [
+            "API dashboard.request_tracker.tenant_id",
+            "Session dashboard.session_tracking.tenant_id"
+          ],
+          "status": "present"
+        },
+        {
+          "required_field": "tenant_name",
+          "schema_paths": [
+            "API dashboard.request_tracker.tenant_name",
+            "Session dashboard.session_tracking.organization_name"
+          ],
+          "status": "present_optional"
+        },
+        {
+          "required_field": "user_id",
+          "schema_paths": [
+            "API dashboard.request_tracker.user_id",
+            "Session dashboard.session_tracking.user_id"
+          ],
+          "status": "present"
+        },
+        {
+          "required_field": "username",
+          "schema_paths": [
+            "API dashboard.request_tracker.username",
+            "Session dashboard.session_tracking.User_name"
+          ],
+          "status": "present_optional"
+        },
+        {
+          "required_field": "grouping_dimension",
+          "schema_paths": [
+            "API dashboard.request_tracker.user_role",
+            "Session dashboard.session_tracking.service_type",
+            "API dashboard.request_tracker.resource_type"
+          ],
+          "status": "present (one or more available)"
+        }
+      ],
+      "missing_fields": [],
+      "feasible": true,
+      "feasibility_reason": "User and tenant identifiers are present. Grouping can be achieved with existing fields such as user_role, service_type, or resource_type."
+    },
+    {
+      "priority": "HIGH",
+      "feature": "Credit Bifurcation",
+      "description": "Show detailed credit consumption when clicking on specific users",
+      "required_fields": [
+        {
+          "field": "user_id",
+          "required": true,
+          "purpose": "Identify the user"
+        },
+        {
+          "field": "credits_used_total",
+          "required": true,
+          "purpose": "Total credit consumption for the user"
+        },
+        {
+          "field": "credits_breakdown_by_project",
+          "required": true,
+          "purpose": "Detailed usage per project"
+        },
+        {
+          "field": "credits_breakdown_by_service_or_agent_or_time",
+          "required": false,
+          "purpose": "Finer drilldown (optional)"
+        }
+      ],
+      "schema_field_matches": [
+        {
+          "required_field": "user_id",
+          "schema_paths": [
+            "Session dashboard.session_tracking.user_id",
+            "API dashboard.request_tracker.user_id"
+          ],
+          "status": "present"
+        },
+        {
+          "required_field": "credits_used_total",
+          "schema_paths": [],
+          "status": "missing"
+        },
+        {
+          "required_field": "credits_breakdown_by_project",
+          "schema_paths": [],
+          "status": "missing"
+        },
+        {
+          "required_field": "credits_breakdown_by_service_or_agent_or_time",
+          "schema_paths": [],
+          "status": "missing (cost_history exists but is cost, not credits)"
+        }
+      ],
+      "missing_fields": [
+        "credits_used_total",
+        "credits_breakdown_by_project",
+        "credits_breakdown_by_service_or_agent_or_time"
+      ],
+      "feasible": false,
+      "feasibility_reason": "No credit fields present. Only cost fields are available in session_tracking, which are not equivalent to credits."
+    },
+    {
+      "priority": "High",
+      "feature": "Project Overview",
+      "description": "Display projects users have worked on/created with time consumed",
+      "required_fields": [
+        {
+          "field": "user_id",
+          "required": true,
+          "purpose": "Attribute activity to a user"
+        },
+        {
+          "field": "project_id",
+          "required": true,
+          "purpose": "Identify project"
+        },
+        {
+          "field": "session_start",
+          "required": true,
+          "purpose": "Compute time spent"
+        },
+        {
+          "field": "session_end",
+          "required": true,
+          "purpose": "Compute time spent"
+        },
+        {
+          "field": "project_name",
+          "required": false,
+          "purpose": "Human-friendly project label"
+        },
+        {
+          "field": "project_created_by",
+          "required": false,
+          "purpose": "Identify creator (optional if available)"
+        }
+      ],
+      "schema_field_matches": [
+        {
+          "required_field": "user_id",
+          "schema_paths": [
+            "Session dashboard.session_tracking.user_id"
+          ],
+          "status": "present"
+        },
+        {
+          "required_field": "project_id",
+          "schema_paths": [
+            "Session dashboard.session_tracking.project_id",
+            "API dashboard.request_tracker.project_id"
+          ],
+          "status": "present"
+        },
+        {
+          "required_field": "session_start",
+          "schema_paths": [
+            "Session dashboard.session_tracking.session_start"
+          ],
+          "status": "present"
+        },
+        {
+          "required_field": "session_end",
+          "schema_paths": [
+            "Session dashboard.session_tracking.session_end"
+          ],
+          "status": "present"
+        },
+        {
+          "required_field": "project_name",
+          "schema_paths": [
+            "Deployment dashboard.app_deployments.project_name"
+          ],
+          "status": "present_optional"
+        },
+        {
+          "required_field": "project_created_by",
+          "schema_paths": [],
+          "status": "missing_optional"
+        }
+      ],
+      "missing_fields": [],
+      "feasible": true,
+      "feasibility_reason": "Worked-on projects and time consumed can be derived from session_tracking via session_start/session_end grouped by project_id. Optional 'created_by' is not present but is not required for core time-spent overview."
+    }
+  ]
+}
